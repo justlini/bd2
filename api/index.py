@@ -1,33 +1,18 @@
-import base64
-from io import BytesIO
-from tkinter import Image
-from PIL import Image
+import psycopg2
+from flask import Flask, jsonify
 
-imagem = "Sample_JPG.jpg";
-def converterImg (imagem):
-    with open(imagem, "rb") as image_file:
-        image_bytes = image_file.read()
-    print(base64.b64encode(image_bytes).decode('utf-8'))
-    print("Hello")
+app = Flask(__name__)
 
-    print("ade´23ys")
+OK_CODE = 200
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
 
-    # Create a BytesIO object to handle the image data
-    image_stream = BytesIO(image_bytes)
-
-    # Open the image using Pillow (PIL)
-    img = Image.open(image_stream)
-    img.show()
-
-    def converterImg(imagem):
-        with open(imagem, "rb") as image_file:
-            image_bytes = image_file.read()
-        print(base64.b64encode(image_bytes).decode('utf-8'))
-
-        # Create a BytesIO object to handle the image data
-        image_stream = BytesIO(image_bytes)
-
-        # Open the image using Pillow (PIL)
-        img = Image.open(image_stream)
-        img.show()
-converterImg(imagem)
+def db_connection():
+    credentials = "host= aid.estgoh.ipc.pt dbname=db20221090306 port=5432 user=a2022109306  password=a2022109306"
+    return psycopg2.connect(credentials)
+    if (connection):{
+        print ("Connection established")
+    }
+if __name__ == '__main__':
+    app.run()
