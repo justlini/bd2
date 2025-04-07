@@ -87,7 +87,7 @@ def user_exists(email, nif):
     except Exception as e:
         return False
 
-@app.route('/register')
+@app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
 
