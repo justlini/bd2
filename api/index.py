@@ -55,21 +55,33 @@ def get_db_connection():
         # Se ocorrer um erro na conexão
         return jsonify({"error": f"Erro ao conectar à base de dados: {str(e)}"}), 500
 
+
 def insert_user(nome, email, nif, senha, numerotelefone):
+    conn = get_db_connection()
+    if not conn:  # Check if connection is valid
+        return False, "Failed to connect to the database."
+
     try:
-        conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("CALL inserir_utilizadores(%s, %s, %s, %s, %s);", (nome, email, nif, senha, numerotelefone))
+        cur.execute("""
+            CALL inserir_utilizadores(%s, %s, %s, %s, %s);
+        """, (nome, email, nif, senha, numerotelefone))
         conn.commit()
         cur.close()
         conn.close()
-        return "User inserted successfully!"
+        
+        return True, "User inserted successfully!"
     except Exception as e:
-        return str(e)
+        conn.close()
+        return False, str(e)
+
 
 def user_exists(email, nif):
+    conn = get_db_connection()
+    if not conn:  # Check if connection is valid
+        return False
+
     try:
-        conn = get_db_connection()
         cur = conn.cursor()
         query = "SELECT 1 FROM public.utilizadores WHERE email = %s OR nif = %s LIMIT 1"
         cur.execute(query, (email, nif))
@@ -78,22 +90,42 @@ def user_exists(email, nif):
         conn.close()
         return result is not None
     except Exception as e:
+        conn.close()
         return False
+
 
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    if not all(k in data for k in ["nome", "email", "nif", "senha", "numerotelefone"]):
-        return jsonify({"error": "Missing required parameters"}), 400
-    
-    if user_exists(data["email"], data["nif"]):
-        return jsonify({"error": "User already exists"}), 409
 
-    message = insert_user(data['nome'], data['email'], data['nif'], data['senha'], data['numerotelefone'])
-    if "successfully" in message:
-        return jsonify({"message": message}), 201
+    # Log the received data
+    logging.debug(f"Received data: {data}")
+
+    # Check if all required fields are present
+    if "nome" not in data or "email" not in data or "nif" not in data or "senha" not in data or "numerotelefone" not in data:
+        logging.error("Missing required parameters.")
+        return jsonify({"error": "Missing required parameters"}), BAD_REQUEST
+
+    # Check if user already exists
+    if user_exists(data["email"], data["nif"]):
+        logging.error("User with this email or NIF already exists.")
+        return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
+
+    # Insert user into database
+    success, message = insert_user(
+        data['nome'], 
+        data['email'], 
+        data['nif'], 
+        data['senha'], 
+        data['numerotelefone']
+    )
+
+    if success:
+        logging.info("User inserted successfully.")
+        return jsonify({"message": message}), CREATED
     else:
-        return jsonify({"error": message}), 500
+        logging.error(f"Error inserting user: {message}")
+        return jsonify({"error": message}), INTERNAL_SERVER_ERROR
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
