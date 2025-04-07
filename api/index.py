@@ -32,13 +32,7 @@ def get_db_connection():
 
     # Verifica se todas as variáveis de ambiente estão presentes
     if not all([host, database, user, password]):
-        return jsonify({"error": "Missing environment variables"}), 400
-
-    print("Tentando conectar à base de dados com os seguintes dados:")
-    print(f"Host: {host}")
-    print(f"Database: {database}")
-    print(f"User: {user}")
-    print(f"Password: {password}")
+        return None  # Retorna None se faltar alguma variável
 
     try:
         # Conecta à base de dados
@@ -48,39 +42,31 @@ def get_db_connection():
             user=user,
             password=password
         )
-        # Se a conexão for bem-sucedida
-        connection.close()  # Fecha a conexão após a tentativa
-        return jsonify({"message": "Conexão bem-sucedida com a base de dados!"}), 200
+        return connection  # Retorna somente a conexão
     except Exception as e:
-        # Se ocorrer um erro na conexão
-        return jsonify({"error": f"Erro ao conectar à base de dados: {str(e)}"}), 500
-
+        print(f"Erro ao conectar à base de dados: {str(e)}")
+        return None
 
 def insert_user(nome, email, nif, senha, numerotelefone):
     conn = get_db_connection()
-    if not conn:  # Check if connection is valid
-        return False, "Failed to connect to the database."
-
+    if conn is None:
+        return "Erro de conexão com a base de dados."
+    
     try:
         cur = conn.cursor()
-        cur.execute("""
-            CALL inserir_utilizadores(%s, %s, %s, %s, %s);
-        """, (nome, email, nif, senha, numerotelefone))
+        cur.execute("CALL inserir_utilizadores(%s, %s, %s, %s, %s);", (nome, email, nif, senha, numerotelefone))
         conn.commit()
         cur.close()
         conn.close()
-        
-        return True, "User inserted successfully!"
+        return "User inserted successfully!"
     except Exception as e:
-        conn.close()
-        return False, str(e)
-
+        return str(e)
 
 def user_exists(email, nif):
     conn = get_db_connection()
-    if not conn:  # Check if connection is valid
+    if conn is None:
         return False
-
+    
     try:
         cur = conn.cursor()
         query = "SELECT 1 FROM public.utilizadores WHERE email = %s OR nif = %s LIMIT 1"
@@ -90,9 +76,7 @@ def user_exists(email, nif):
         conn.close()
         return result is not None
     except Exception as e:
-        conn.close()
         return False
-
 
 @app.route('/register', methods=['POST'])
 def register():
