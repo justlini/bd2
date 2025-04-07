@@ -8,11 +8,16 @@ OK_CODE = 200
 def hello_world():
     return 'Hello, World!'
 
-def db_connection():
-    credentials = "host= aid.estgoh.ipc.pt dbname=db20221090306 port=5432 user=a2022109306  password=a2022109306"
-    return psycopg2.connect(credentials)
-    if (connection):{
-        print ("Connection established")
-    }
+def get_db_connection():
+    host = os.getenv("db_host")
+    connection = psycopg2.connect(
+        host=host,
+        database=os.getenv("db_database"),
+        user=os.getenv("db_user"),
+        password=os.getenv("db_password")
+    )
+    print(host)  #w Print host after it has been retrieved
+    return connection
+
 if __name__ == '__main__':
     app.run()
