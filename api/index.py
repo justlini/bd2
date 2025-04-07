@@ -125,6 +125,49 @@ def register():
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
+# Rota para login de usuário
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+
+        # Log dos dados recebidos
+        logging.debug(f"Login data received: {data}")
+
+        # Verifica se email e senha estão presentes
+        if not all(k in data for k in ["email", "senha"]):
+            logging.error("Missing email or password.")
+            return jsonify({"error": "Missing email or password"}), BAD_REQUEST
+
+        # Conexão com o banco
+        conn = get_db_connection()
+        if conn is None:
+            logging.error("Database connection failed.")
+            return jsonify({"error": "Database connection failed"}), INTERNAL_SERVER_ERROR
+
+        cur = conn.cursor()
+        query = "SELECT idcliente, nome, email FROM public.utilizadores WHERE email = %s AND senha = %s"
+        cur.execute(query, (data["email"], data["senha"]))
+        user = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        if user:
+            # Login bem-sucedido
+            user_data = {
+                "idcliente": user[0],
+                "nome": user[1],
+                "email": user[2]
+            }
+            logging.info(f"User {user[2]} logged in successfully.")
+            return jsonify({"message": "Login successful", "user": user_data}), OK_CODE
+        else:
+            logging.warning("Invalid email or password.")
+            return jsonify({"error": "Invalid email or password"}), BAD_REQUEST
+    except Exception as e:
+        logging.error(f"Login error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 
 # Execução do aplicativo Flask
