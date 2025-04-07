@@ -1,6 +1,8 @@
 import os
 import psycopg2
-from flask import Flask, jsonify,request
+from flask import Flask, jsonify, request  
+import logging  
+
 
 app = Flask(__name__)
 
@@ -85,16 +87,20 @@ def user_exists(email, nif):
 def register():
     data = request.get_json()
 
+    # Log the received data
+    logging.debug(f"Received data: {data}")
+
     # Check if all required fields are present
     if "nome" not in data or "email" not in data or "nif" not in data or "senha" not in data or "numerotelefone" not in data:
-        return jsonify({"error": "Missing required parameters"}),
+        logging.error("Missing required parameters.")
+        return jsonify({"error": "Missing required parameters"}), BAD_REQUEST
 
     # Check if user already exists
     if user_exists(data["email"], data["nif"]):
-        return jsonify({"error": "User with this email or NIF already exists"}), 
+        logging.error("User with this email or NIF already exists.")
+        return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
 
     # Insert user into database
-    #insert
     success, message = insert_user(
         data['nome'], 
         data['email'], 
@@ -104,10 +110,11 @@ def register():
     )
 
     if success:
-        return jsonify({"message": message}), 
+        logging.info("User inserted successfully.")
+        return jsonify({"message": message}), CREATED
     else:
-        return jsonify({"error": message}),
-
+        logging.error(f"Error inserting user: {message}")
+        return jsonify({"error": message}), INTERNAL_SERVER_ERROR
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
