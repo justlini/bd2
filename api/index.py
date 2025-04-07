@@ -10,6 +10,8 @@ def converterImg (imagem):
     print(base64.b64encode(image_bytes).decode('utf-8'))
     print("Hello")
 
+    print("adeys")
+
     # Create a BytesIO object to handle the image data
     image_stream = BytesIO(image_bytes)
 
