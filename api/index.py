@@ -22,15 +22,34 @@ def print_env_vars():
 
 def get_db_connection():
     host = os.getenv("db_host")
+    database = os.getenv("db_database")
+    user = os.getenv("db_user")
+    password = os.getenv("db_password")
+
+    print("Tentando conectar à base de dados com os seguintes dados:")
+    print(f"Host: {host}")
+    print(f"Database: {database}")
+    print(f"User: {user}")
+    print(f"Password: {password}")
+
     connection = psycopg2.connect(
         host=host,
-        database=os.getenv("db_database"),
-        user=os.getenv("db_user"),
-        password=os.getenv("db_password")
+        database=database,
+        user=user,
+        password=password
     )
-    print(f"Connected to DB at host: {host}")
     return connection
+
+@app.route('/test-db')
+def test_db_connection():
+    try:
+        conn = get_db_connection()
+        conn.close()
+        return jsonify({"status": "success", "message": "Ligação à base de dados bem sucedida!"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
+
 
