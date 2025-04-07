@@ -48,6 +48,7 @@ def register():
         return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
 
     # Insert user into database
+    #insert
     success, message = insert_user(
         data['nome'], 
         data['email'], 
