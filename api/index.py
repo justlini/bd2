@@ -20,6 +20,7 @@ def print_env_vars():
     }
     return jsonify(env_vars), OK_CODE
 
+@app.route('/ola')
 def get_db_connection():
     host = os.getenv("db_host")
     database = os.getenv("db_database")
