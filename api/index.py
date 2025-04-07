@@ -125,6 +125,54 @@ def register():
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
+@app.route('/inserir_utilizador', methods=['POST'])
+def inserir_utilizador():
+    # Get the data from the incoming request (JSON format)
+    data = request.get_json()
+
+    # Extract the necessary fields
+    nome = data.get("nome")
+    email = data.get("email")
+    nif = data.get("nif")
+    senha = data.get("senha")
+    numerotelefone = data.get("numerotelefone")
+
+    # Check if all required fields are provided
+    if not all([nome, email, nif, senha, numerotelefone]):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    # Get a database connection
+    connection = get_db_connection()
+    if connection is None:
+        return jsonify({"error": "Failed to connect to the database"}), 500
+
+    try:
+        # Create a cursor to execute the stored procedure
+        cursor = connection.cursor()
+        
+        # Call the stored procedure for inserting the user
+        cursor.callproc('public.inserir_utilizadores', (nome, email, nif, senha, numerotelefone))
+        
+        # Commit the transaction
+        connection.commit()
+
+        # Close the cursor and connection
+        cursor.close()
+        connection.close()
+
+        return jsonify({"message": "User inserted successfully"}), OK_CODE
+
+    except Exception as e:
+        print(f"Error during insertion: {str(e)}")
+        return jsonify({"error": "Failed to insert user"}), 500
+
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
+
+
+
+
 # Execução do aplicativo Flask
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
