@@ -14,5 +14,6 @@ def db_connection():
     if (connection):{
         print ("Connection established")
     }
+
 if __name__ == '__main__':
     app.run()
