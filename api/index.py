@@ -67,7 +67,19 @@ def insert_user(nome, email, nif, senha, numerotelefone):
     except Exception as e:
         return str(e)
 
-# Register route
+def user_exists(email, nif):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        query = "SELECT 1 FROM public.utilizadores WHERE email = %s OR nif = %s LIMIT 1"
+        cur.execute(query, (email, nif))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return result is not None
+    except Exception as e:
+        return False
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
