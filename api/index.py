@@ -87,11 +87,11 @@ def register():
 
     # Check if all required fields are present
     if "nome" not in data or "email" not in data or "nif" not in data or "senha" not in data or "numerotelefone" not in data:
-        return jsonify({"error": "Missing required parameters"}), BAD_REQUEST
+        return jsonify({"error": "Missing required parameters"}),
 
     # Check if user already exists
     if user_exists(data["email"], data["nif"]):
-        return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
+        return jsonify({"error": "User with this email or NIF already exists"}), 
 
     # Insert user into database
     #insert
@@ -104,9 +104,9 @@ def register():
     )
 
     if success:
-        return jsonify({"message": message}), CREATED
+        return jsonify({"message": message}), 
     else:
-        return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+        return jsonify({"error": message}),
 
 
 if __name__ == '__main__':
