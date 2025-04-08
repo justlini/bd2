@@ -70,6 +70,21 @@ def insert_user(nome, email, nif, senha, numerotelefone):
     except Exception as e:
         return str(e)  # Retorna o erro ocorrido
 
+def insert_emp(idemp, tipoemp, idcliente):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erro de conexão com a base de dados."
+
+    try:
+        cur = conn.cursor()
+        cur.execute("CALL inserir_emp(%s, %s, %s);", (idemp, tipoemp, idcliente))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return "empregado inserirdo com sucesso"
+    except Exception as e:
+        return str(e)
+
 # Função para verificar se o usuário já existe
 def user_exists(email, nif):
     conn = get_db_connection()
@@ -93,20 +108,16 @@ def register():
     try:
         data = request.get_json()
 
-        # Log dos dados recebidos
         logging.debug(f"Received data: {data}")
 
-        # Verifica se todos os campos necessários estão presentes
         if not all(k in data for k in ["nome", "email", "nif", "senha", "numerotelefone"]):
             logging.error("Missing required parameters.")
             return jsonify({"error": "Missing required parameters"}), BAD_REQUEST
 
-        # Verifica se o usuário já existe
         if user_exists(data["email"], data["nif"]):
             logging.error("User with this email or NIF already exists.")
             return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
 
-        # Insere o usuário no banco de dados
         message = insert_user(
             data['nome'], 
             data['email'], 
