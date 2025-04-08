@@ -53,7 +53,7 @@ def get_db_connection():
     except Exception as e:
         print(f"Erro ao ciionectar à base de dados: {str(e)}")
         return None
-#inserir utilizador
+
 def insert_user(nome, email, nif, senha, numerotelefone):
     conn = get_db_connection()
     #se a conexaõ for None retorna um erro de conexão
@@ -71,7 +71,6 @@ def insert_user(nome, email, nif, senha, numerotelefone):
     except Exception as e:
         return str(e)
 
-#inserir empregado
 def insert_emp(idemp, tipoemp, idcliente):
     conn = get_db_connection()
     if conn is None:
@@ -87,7 +86,7 @@ def insert_emp(idemp, tipoemp, idcliente):
     except Exception as e:
         return str(e)
 
-#inserir quarto
+
 def insert_quarto(p_numeroquarto, p_precoquarto, p_tipoquarto):
     conn = get_db_connection()
     if conn is None:
@@ -95,27 +94,12 @@ def insert_quarto(p_numeroquarto, p_precoquarto, p_tipoquarto):
 
     try:
         cur = conn.cursor()
-        cur.execute("CALL inserir_quartos(%s, %s, %s);", (p_numeroquarto, p_precoquarto, p_tipoquarto))
+        # Correct the query to pass all parameters dynamically
+        cur.execute("CALL inserir_quartos(%s, %s, %s, %s);", (p_numeroquarto, p_precoquarto, p_tipoquarto))
         conn.commit()
         cur.close()
         conn.close()
         return "Quarto inserido com sucesso!"
-    except Exception as e:
-        return str(e)
-
-#inserir reserva
-def insert_reserva(p_idcliente, p_idquarto,p_datacheckin,p_datacheckout):
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-
-    try:
-        cur = conn.cursor()
-        cur.execute("CALL inserir_reserva(%s, %s, %s, %s);", (p_idcliente, p_idquarto,p_datacheckin,p_datacheckout))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return "Reserva feita com sucesso!"
     except Exception as e:
         return str(e)
 
@@ -200,55 +184,6 @@ def registar_quarto():
             return jsonify({"message": message}), CREATED
         else:
             logging.error(f"Erro ao inserir quarto: {message}")
-            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
-    except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
-
-@app.route('/inserir_reserva', methods=['POST'])
-def inserir_reserva():
-    try:
-        data = request.get_json()
-        #debug de erros descomentar quando estiver a dar treta
-        #logging.debug(f"Received data: {data}")
-
-        #verificar se todos os parametros existem
-        if not all(k in data for k in ["p_idcliente", "p_idquarto", "p_datacheckin", "p_datacheckout"]):
-            logging.error("Faltam parametros!")
-
-            #erro no postman
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
-
-        #verificar se o empregado já exsite
-        if emp_exists(data["idemp"], data["idcliente"]):
-            logging.error("Empregado com este ID já existe")
-            logging.error("Utilizador com este mail ou NIF já existe!")
-
-            # erro no postman
-            return jsonify({"error": "Utilizador com este mail ou NIF já existe!"}), CONFLICT
-
-        #verificar se o tipo de empregado é admin ou rececionista
-        if data["tipoemp"] not in ["admin", "rececionista"]:
-            logging.error("Tipo de mepregado invalido!")
-
-            # erro no postman
-            return jsonify({"error": "Tipo de mepregado invalido!"}), BAD_REQUEST
-
-        #formato do body json esperado
-        message = insert_emp(
-            data['idemp'],
-            data['tipoemp'],
-            data['idcliente']
-        )
-
-        #empregado existe
-        if "Empregado inserido com sucesso!" in message:
-            logging.info("Empregado inserido com sucesso!")
-
-            #mensagem sucess no postman
-            return jsonify({"message": message}), CREATED
-        else:
-            logging.error(f"Erro ao inserir empregado: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
