@@ -87,7 +87,7 @@ def insert_emp(idemp, tipoemp, idcliente):
         return str(e)
 
 
-def insert_quarto(p_numeroquarto,p_precoquarto, p_ocupado, p_tipoquarto):
+def insert_quarto(numQuarto,precoQuarto, ocupado, tipoQuarto):
     conn = get_db_connection()
     # se a conexaõ for None retorna um erro de conexão
     if conn is None:
@@ -96,7 +96,7 @@ def insert_quarto(p_numeroquarto,p_precoquarto, p_ocupado, p_tipoquarto):
     try:
         cur = conn.cursor()
         # procidure inserir_quartos
-        cur.execute("CALL inserir_quartos(%s, %s, 0, %s);", (p_numeroquarto,p_precoquarto, p_ocupado, p_tipoquarto))
+        cur.execute("CALL inserir_quartos(%s, %s, %s, %s);", (numQuarto,precoQuarto, ocupado, tipoQuarto))
         conn.commit()
         cur.close()
         conn.close()
@@ -161,7 +161,7 @@ def registar_quarto():
         #logging.debug(f"Received data: {data}")
 
         #verificar se todos os parametros existem
-        if not all(k in data for k in ["p_numeroquarto","p_precoquarto", "p_ocupado", "p_tipoquarto"]):
+        if not all(k in data for k in ["numQuarto","precoQuarto", "ocupado", "tipoQuarto"]):
             logging.error("Faltam parametros!")
 
             #erro no postman
@@ -185,10 +185,9 @@ def registar_quarto():
             return jsonify({"error": "Tipo de quarto invalido!"}), BAD_REQUEST
         #formato do body json esperado
         message = insert_quarto(
-            data['p_numeroquarto'],
-            data['p_precoquarto'],
-            data['p_ocupado'],
-            data['p_tipoquarto']
+            data['numQuarto'],
+            data[0],
+            data['tipoQuarto']
         )
 
         #Quarto existe
