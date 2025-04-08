@@ -239,7 +239,7 @@ def user_exists(email, nif):
         return False  # Retorna False caso haja erro na execução da consultaº
 
 # Função para verificar se o quarto já existe
-def quarto_exists(numQuarto):
+def quarto_exists(p_numeroquarto):
     conn = get_db_connection()
     if conn is None:
         return False  # Se não conseguir se conectar na base de dados, assume que o utilizador não existe
@@ -247,7 +247,7 @@ def quarto_exists(numQuarto):
     try:
         cur = conn.cursor()
         query = "SELECT 1 FROM public.quartos WHERE p_numeroquarto = %s LIMIT 1"
-        cur.execute(query, (numQuarto))
+        cur.execute(query, (p_numeroquarto))
         result = cur.fetchone()
         cur.close()
         conn.close()
