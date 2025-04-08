@@ -87,16 +87,15 @@ def insert_emp(idemp, tipoemp, idcliente):
         return str(e)
 
 
-def insert_quarto(p_numeroquarto,p_precoquarto, p_ocupado, p_tipoquarto):
+def insert_quarto(p_numeroquarto, p_precoquarto, p_ocupado, p_tipoquarto):
     conn = get_db_connection()
-    # se a conexaõ for None retorna um erro de conexão
     if conn is None:
         return "Erro de conexão com a base de dados."
 
     try:
         cur = conn.cursor()
-        # procidure inserir_quartos
-        cur.execute("CALL inserir_quartos(%s, %s, 0, %s);", (p_numeroquarto,p_precoquarto, p_ocupado, p_tipoquarto))
+        # Correct the query to pass all parameters dynamically
+        cur.execute("CALL inserir_quartos(%s, %s, %s, %s);", (p_numeroquarto, p_precoquarto, p_ocupado, p_tipoquarto))
         conn.commit()
         cur.close()
         conn.close()
@@ -157,33 +156,23 @@ def register_emp():
 def registar_quarto():
     try:
         data = request.get_json()
-        #debug de erros descomentar quando estiver a dar treta
-        #logging.debug(f"Received data: {data}")
 
-        #verificar se todos os parametros existem
-        if not all(k in data for k in ["p_numeroquarto","p_precoquarto", "p_ocupado", "p_tipoquarto"]):
+        # Validate input parameters
+        if not all(k in data for k in ["p_numeroquarto", "p_precoquarto", "p_ocupado", "p_tipoquarto"]):
             logging.error("Faltam parametros!")
-
-            #erro no postman
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
-        #verificar se o quarto já exsite
-        if quarto_exists(data["numQuarto"]):
+        # Check if the room already exists
+        if quarto_exists(data["p_numeroquarto"]):
             logging.error("Quarto com esse numero já existe!")
-
-            # erro no postman
             return jsonify({"error": "Quarto com esse numero já existe!"}), CONFLICT
 
-        #verificar se o tipo de quarto é casal ou solteiro
-        if data["tipoQuarto"] not in ["casal", "solteiro"]:
+        # Validate room type
+        if data["p_tipoquarto"] not in ["casal", "solteiro"]:
             logging.error("Tipo de quarto invalido!")
-
-            # erro no postman
             return jsonify({"error": "Tipo de quarto invalido!"}), BAD_REQUEST
 
-            # erro no postman
-            return jsonify({"error": "Tipo de quarto invalido!"}), BAD_REQUEST
-        #formato do body json esperado
+        # Call the insert_quarto function
         message = insert_quarto(
             data['p_numeroquarto'],
             data['p_precoquarto'],
@@ -191,11 +180,8 @@ def registar_quarto():
             data['p_tipoquarto']
         )
 
-        #Quarto existe
-        if "Qaurto inserido com sucesso!" in message:
+        if "Quarto inserido com sucesso!" in message:
             logging.info("Quarto inserido com sucesso!")
-
-            #mensagem sucess no postman
             return jsonify({"message": message}), CREATED
         else:
             logging.error(f"Erro ao inserir quarto: {message}")
