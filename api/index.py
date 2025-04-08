@@ -110,12 +110,11 @@ def insert_reserva(p_idcliente, p_idquarto, p_datacheckin,p_datacheckout):
 
     try:
         cur = conn.cursor()
-        # Correct the query to pass all parameters dynamically
         cur.execute("CALL inserir_reserva(%s, %s, %s,%s);", (p_idcliente, p_idquarto, p_datacheckin,p_datacheckout))
         conn.commit()
         cur.close()
         conn.close()
-        return "Quarto inserido com sucesso!"
+        return "Reserva feita feita com sucesso!"
     except Exception as e:
         return str(e)
 
@@ -211,12 +210,12 @@ def registar_reserva():
     try:
         data = request.get_json()
 
-        # Validate input parameters
+        # validar os parametros de entrada
         if not all(k in data for k in ["p_idcliente", "p_idquarto", "p_datacheckin", "p_datacheckout"]):
             logging.error("Faltam parametros!")
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
-        # Call the insert_quarto function
+        # chamar funcao para fazer reserva com o body formato para o postman
         message = insert_reserva(
             data['p_idcliente'],
             data['p_idquarto'],
@@ -224,11 +223,11 @@ def registar_reserva():
             data['p_datacheckout']
         )
 
-        if "Quarto inserido com sucesso!" in message:
+        if "Reserva feita feita com sucesso!" in message:
             logging.info("reserva inserido com sucesso!")
             return jsonify({"message": message}), CREATED
         else:
-            logging.error(f"error ao inserir quarto: {message}")
+            logging.error(f"error ao fazer reserva: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
