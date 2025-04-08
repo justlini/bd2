@@ -102,6 +102,22 @@ def insert_quarto(p_numeroquarto, p_precoquarto, p_tipoquarto):
         return "Quarto inserido com sucesso!"
     except Exception as e:
         return str(e)
+    
+def insert_reserva(p_idcliente, p_idquarto, p_datacheckin,p_datacheckout):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erro de conexão com a base de dados."
+
+    try:
+        cur = conn.cursor()
+        # Correct the query to pass all parameters dynamically
+        cur.execute("CALL inserir_reserva(%s, %s, %s,%s);", (p_idcliente, p_idquarto, p_datacheckin,p_datacheckout))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return "Quarto inserido com sucesso!"
+    except Exception as e:
+        return str(e)
 
 @app.route('/inserir_emp', methods=['POST'])
 def register_emp():
@@ -184,6 +200,35 @@ def registar_quarto():
             return jsonify({"message": message}), CREATED
         else:
             logging.error(f"Erro ao inserir quarto: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+    
+@app.route('/inserir_reserva', methods=['POST'])
+def registar_reserva():
+    try:
+        data = request.get_json()
+
+        # Validate input parameters
+        if not all(k in data for k in ["p_idcliente", "p_idquarto", "p_datacheckin", "p_datacheckout"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Call the insert_quarto function
+        message = insert_reserva(
+            data['p_idcliente'],
+            data['p_idquarto'],
+            data['p_datacheckin'],
+            data['p_datacheckout']
+        )
+
+        if "Quarto inserido com sucesso!" in message:
+            logging.info("reserva inserido com sucesso!")
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"error ao inserir quarto: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
