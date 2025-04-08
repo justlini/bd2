@@ -84,6 +84,58 @@ def insert_emp(idemp, tipoemp, idcliente):
         return "empregado inserirdo com sucesso"
     except Exception as e:
         return str(e)
+    
+@app.route('/inserir_emp', methods=['POST'])
+def register_emp():
+    try:
+        data = request.get_json()
+
+        logging.debug(f"Received data: {data}")
+
+        if not all(k in data for k in ["idemp", "tipoemp", "idcliente"]):
+            logging.error("Missing required parameters.")
+            return jsonify({"error": "Missing required parameters"}), BAD_REQUEST
+
+        if emp_exists(data["idemp"], data["idcliente"]):
+            logging.error("Employee with this ID or client already exists.")
+            logging.error("User with this email or NIF already exists.")
+            return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
+        
+        if data["tipoemp"] not in ["admin", "rececionista"]:
+            logging.error("Invalid employee type.")
+            return jsonify({"error": "Invalid employee type"}), BAD_REQUEST
+
+        message = insert_emp(
+            data['idemp'], 
+            data['tipoemp'], 
+            data['idemp']
+        )
+
+        if "Employee inserted successfully!" in message:
+            logging.info("Empolye inserted successfully.")
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"Error inserting employee: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+def emp_exists(idemp, idcliente):
+    conn = get_db_connection()
+    if conn is None:
+        return False  # Se não conseguir se conectar ao banco, assume que o usuário não existe
+    
+    try:
+        cur = conn.cursor()
+        query = "SELECT 1 FROM public.emp WHERE idemp = %s OR idcliente = %s LIMIT 1"
+        cur.execute(query, (idemp, idcliente))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return result is not None  # Retorna True se o usuário existir
+    except Exception as e:
+        return False  # Retorna False caso haja erro na execução da consulta
 
 # Função para verificar se o usuário já existe
 def user_exists(email, nif):
