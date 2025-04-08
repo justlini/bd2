@@ -185,6 +185,7 @@ def registar_quarto():
         #formato do body json esperado
         message = insert_quarto(
             data['numQuarto'],
+            data['precoQuarto'],
             data[0],
             data['tipoQuarto']
         )
