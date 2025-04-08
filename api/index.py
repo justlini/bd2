@@ -85,7 +85,25 @@ def insert_emp(idemp, tipoemp, idcliente):
         return "Empregado inserirdo com sucesso!"
     except Exception as e:
         return str(e)
-    
+
+
+def insert_quarto(numQuarto,precoQuarto, ocupado, tipoQuarto):
+    conn = get_db_connection()
+    # se a conexaõ for None retorna um erro de conexão
+    if conn is None:
+        return "Erro de conexão com a base de dados."
+
+    try:
+        cur = conn.cursor()
+        # procidure inserir_quartos
+        cur.execute("CALL inserir_quartos(%s, %s, %s, %s);", (numQuarto,precoQuarto, ocupado, tipoQuarto))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return "Quarto inserido com sucesso!"
+    except Exception as e:
+        return str(e)
+
 @app.route('/inserir_emp', methods=['POST'])
 def register_emp():
     try:
@@ -134,7 +152,57 @@ def register_emp():
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
-    
+@app.route('/inserir_quarto', methods=['POST'])
+def registar_quarto():
+    try:
+        data = request.get_json()
+        #debug de erros descomentar quando estiver a dar treta
+        #logging.debug(f"Received data: {data}")
+
+        #verificar se todos os parametros existem
+        if not all(k in data for k in ["numQuarto","precoQuarto", "ocupado", "tipoQuarto"]):
+            logging.error("Faltam parametros!")
+
+            #erro no postman
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        #verificar se o quarto já exsite
+        if quarto_exists(data["numQuarto"]):
+            logging.error("Quarto com esse numero já existe!")
+
+            # erro no postman
+            return jsonify({"error": "Quarto com esse numero já existe!"}), CONFLICT
+
+        #verificar se o tipo de quarto é casal ou solteiro
+        if data["tipoQuarto"] not in ["casal", "solteiro"]:
+            logging.error("Tipo de quarto invalido!")
+
+            # erro no postman
+            return jsonify({"error": "Tipo de quarto invalido!"}), BAD_REQUEST
+
+            # erro no postman
+            return jsonify({"error": "Tipo de quarto invalido!"}), BAD_REQUEST
+        #formato do body json esperado
+        message = insert_quarto(
+            data['numQuarto'],
+            data[0],
+            data['tipoQuarto']
+        )
+
+        #Quarto existe
+        if "Qaurto inserido com sucesso!" in message:
+            logging.info("Quarto inserido com sucesso!")
+
+            #mensagem sucess no postman
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"Erro ao inserir quarto: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+
+# Função para verificar se o empregado já existe
 def emp_exists(idemp, idcliente):
     conn = get_db_connection()
     if conn is None:
@@ -166,9 +234,26 @@ def user_exists(email, nif):
         conn.close()
         return result is not None  # Retorna True se o utilizador existir
     except Exception as e:
+        return False  # Retorna False caso haja erro na execução da consultaº
+
+# Função para verificar se o quarto já existe
+def quarto_exists(numQuarto):
+    conn = get_db_connection()
+    if conn is None:
+        return False  # Se não conseguir se conectar na base de dados, assume que o utilizador não existe
+
+    try:
+        cur = conn.cursor()
+        query = "SELECT 1 FROM public.quartos WHERE p_numeroquarto = %s LIMIT 1"
+        cur.execute(query, (numQuarto))
+        result = cur.fetchone()
+        cur.close()
+        conn.close()
+        return result is not None  # Retorna True se o quarto existir
+    except Exception as e:
         return False  # Retorna False caso haja erro na execução da consulta
 
-# Rota para registrar um novo utilziador
+# Caminho para registrar um novo utilziador
 @app.route('/register', methods=['POST'])
 def register():
     try:
