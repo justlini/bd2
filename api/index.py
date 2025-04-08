@@ -108,7 +108,7 @@ def register_emp():
         message = insert_emp(
             data['idemp'], 
             data['tipoemp'], 
-            data['idemp']
+            data['idcliente']
         )
 
         if "Employee inserted successfully!" in message:
