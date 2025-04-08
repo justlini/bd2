@@ -87,7 +87,7 @@ def insert_emp(idemp, tipoemp, idcliente):
         return str(e)
 
 
-def insert_quarto(numQuarto,precoQuarto, ocupado, tipoQuarto):
+def insert_quarto(numQuarto, precoQuarto, tipoQuarto):
     conn = get_db_connection()
     # se a conexaõ for None retorna um erro de conexão
     if conn is None:
@@ -96,7 +96,7 @@ def insert_quarto(numQuarto,precoQuarto, ocupado, tipoQuarto):
     try:
         cur = conn.cursor()
         # procidure inserir_quartos
-        cur.execute("CALL inserir_quartos(%s, %s, %s, %s);", (numQuarto,precoQuarto, ocupado, tipoQuarto))
+        cur.execute("CALL inserir_quartos(%s, %s, %s);", (numQuarto, precoQuarto, tipoQuarto))
         conn.commit()
         cur.close()
         conn.close()
@@ -160,7 +160,7 @@ def registar_quarto():
         #logging.debug(f"Received data: {data}")
 
         #verificar se todos os parametros existem
-        if not all(k in data for k in ["numQuarto","precoQuarto", "ocupado", "tipoQuarto"]):
+        if not all(k in data for k in ["numQuarto","precoQuarto", "tipoQuarto"]):
             logging.error("Faltam parametros!")
 
             #erro no postman
@@ -186,7 +186,6 @@ def registar_quarto():
         message = insert_quarto(
             data['numQuarto'],
             data['precoQuarto'],
-            data[0],
             data['tipoQuarto']
         )
 
