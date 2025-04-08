@@ -51,7 +51,7 @@ def get_db_connection():
         )
         return connection  # Retorna a conexão
     except Exception as e:
-        print(f"Erro ao conectar à base de dados: {str(e)}")
+        print(f"Erro ao ciionectar à base de dados: {str(e)}")
         return None
 
 # Função para inserir um usuário no banco de dados
