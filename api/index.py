@@ -6,7 +6,7 @@ import logging
 # Configuração do Flask
 app = Flask(__name__)
 
-# Códigos HTTP de resposta
+# Códigos HTTP
 OK_CODE = 200
 BAD_REQUEST = 400
 CONFLICT = 409
@@ -18,7 +18,7 @@ CREATED = 201
 def hello_world():
     return 'Hello, World!'
 
-# Rota para verificar variáveis de ambiente
+# caminho para ir buscar as variaveis de ambiente
 @app.route('/env')
 def print_env_vars():
     env_vars = {
@@ -29,16 +29,16 @@ def print_env_vars():
     }
     return jsonify(env_vars), OK_CODE
 
-# Função para conectar ao banco de dados
+# Função para conectar na base de dados
 def get_db_connection():
-    # Obtém as variáveis de ambiente
+    # buscar as variaveis de ambiente
     host = os.getenv("db_host")
     database = os.getenv("db_database")
     user = os.getenv("db_user")
     password = os.getenv("db_password")
 
-    # Verifica se todas as variáveis de ambiente estão presentes
-    if not all([host, database, user, password]):
+    # Verifica se todas as variáveis de ambiente existem
+    if not all([host , database, user, password]):
         return None  # Retorna None se faltar alguma variável
 
     try:
@@ -54,21 +54,22 @@ def get_db_connection():
         print(f"Erro ao ciionectar à base de dados: {str(e)}")
         return None
 
-# Função para inserir um usuário no banco de dados
 def insert_user(nome, email, nif, senha, numerotelefone):
     conn = get_db_connection()
+    #se a conexaõ for None retorna um erro de conexão
     if conn is None:
         return "Erro de conexão com a base de dados."
     
     try:
         cur = conn.cursor()
+        #procidure inserir_utilizadores
         cur.execute("CALL inserir_utilizadores(%s, %s, %s, %s, %s);", (nome, email, nif, senha, numerotelefone))
         conn.commit()
         cur.close()
         conn.close()
-        return "User inserted successfully!"  # Retorna a mensagem de sucesso
+        return "Utilizador inserido com sucesso!"
     except Exception as e:
-        return str(e)  # Retorna o erro ocorrido
+        return str(e)
 
 def insert_emp(idemp, tipoemp, idcliente):
     conn = get_db_connection()
@@ -81,7 +82,7 @@ def insert_emp(idemp, tipoemp, idcliente):
         conn.commit()
         cur.close()
         conn.close()
-        return "empregado inserirdo com sucesso"
+        return "Empregado inserirdo com sucesso!"
     except Exception as e:
         return str(e)
     
@@ -89,33 +90,46 @@ def insert_emp(idemp, tipoemp, idcliente):
 def register_emp():
     try:
         data = request.get_json()
+        #debug de erros descomentar quando estiver a dar treta
+        #logging.debug(f"Received data: {data}")
 
-        logging.debug(f"Received data: {data}")
-
+        #verificar se todos os parametros existem
         if not all(k in data for k in ["idemp", "tipoemp", "idcliente"]):
-            logging.error("Missing required parameters.")
-            return jsonify({"error": "Missing required parameters"}), BAD_REQUEST
+            logging.error("Faltam parametros!")
 
+            #erro no postman
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        #verificar se o empregado já exsite
         if emp_exists(data["idemp"], data["idcliente"]):
-            logging.error("Employee with this ID or client already exists.")
-            logging.error("User with this email or NIF already exists.")
-            return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
-        
-        if data["tipoemp"] not in ["admin", "rececionista"]:
-            logging.error("Invalid employee type.")
-            return jsonify({"error": "Invalid employee type"}), BAD_REQUEST
+            logging.error("Empregado com este ID já existe")
+            logging.error("Utilizador com este mail ou NIF já existe!")
 
+            # erro no postman
+            return jsonify({"error": "Utilizador com este mail ou NIF já existe!"}), CONFLICT
+
+        #verificar se o tipo de empregado é admin ou rececionista
+        if data["tipoemp"] not in ["admin", "rececionista"]:
+            logging.error("Tipo de mepregado invalido!")
+
+            # erro no postman
+            return jsonify({"error": "Tipo de mepregado invalido!"}), BAD_REQUEST
+
+        #formato do body json esperado
         message = insert_emp(
             data['idemp'], 
             data['tipoemp'], 
             data['idcliente']
         )
 
-        if "Employee inserted successfully!" in message:
-            logging.info("Empolye inserted successfully.")
+        #empregado existe
+        if "Empregado inserido com sucesso!" in message:
+            logging.info("Empregado inserido com sucesso!")
+
+            #mensagem sucess no postman
             return jsonify({"message": message}), CREATED
         else:
-            logging.error(f"Error inserting employee: {message}")
+            logging.error(f"Erro ao inserir empregado: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
@@ -133,15 +147,15 @@ def emp_exists(idemp, idcliente):
         result = cur.fetchone()
         cur.close()
         conn.close()
-        return result is not None  # Retorna True se o usuário existir
+        return result is not None  # Retorna True se o utilizador existir
     except Exception as e:
         return False  # Retorna False caso haja erro na execução da consulta
 
-# Função para verificar se o usuário já existe
+# Função para verificar se o utilizador já existe
 def user_exists(email, nif):
     conn = get_db_connection()
     if conn is None:
-        return False  # Se não conseguir se conectar ao banco, assume que o usuário não existe
+        return False  # Se não conseguir se conectar na base de dados, assume que o utilizador não existe
     
     try:
         cur = conn.cursor()
@@ -150,11 +164,11 @@ def user_exists(email, nif):
         result = cur.fetchone()
         cur.close()
         conn.close()
-        return result is not None  # Retorna True se o usuário existir
+        return result is not None  # Retorna True se o utilizador existir
     except Exception as e:
         return False  # Retorna False caso haja erro na execução da consulta
 
-# Rota para registrar um novo usuário
+# Rota para registrar um novo utilziador
 @app.route('/register', methods=['POST'])
 def register():
     try:
