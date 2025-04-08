@@ -95,7 +95,7 @@ def insert_quarto(p_numeroquarto, p_precoquarto, p_tipoquarto):
     try:
         cur = conn.cursor()
         # Correct the query to pass all parameters dynamically
-        cur.execute("CALL inserir_quartos(%s, %s, %s, %s);", (p_numeroquarto, p_precoquarto, p_tipoquarto))
+        cur.execute("CALL inserir_quartos(%s, %s, %s);", (p_numeroquarto, p_precoquarto, p_tipoquarto))
         conn.commit()
         cur.close()
         conn.close()
