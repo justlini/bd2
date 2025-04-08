@@ -134,10 +134,11 @@ def register_emp():
 
         #formato do body json esperado
         message = insert_emp(
-            data['idemp'], 
-            data['tipoemp'], 
+            data['idemp'],
+            data['tipoemp'],
             data['idcliente']
         )
+        p_idcliente, p_idquarto, p_datacheckin, p_datacheckout
 
         #empregado existe
         if "Empregado inserido com sucesso!" in message:
