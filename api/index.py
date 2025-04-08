@@ -87,7 +87,7 @@ def insert_emp(idemp, tipoemp, idcliente):
         return str(e)
 
 
-def insert_quarto(p_numeroquarto, p_precoquarto, p_ocupado, p_tipoquarto):
+def insert_quarto(p_numeroquarto, p_precoquarto, p_tipoquarto):
     conn = get_db_connection()
     if conn is None:
         return "Erro de conexão com a base de dados."
@@ -95,7 +95,7 @@ def insert_quarto(p_numeroquarto, p_precoquarto, p_ocupado, p_tipoquarto):
     try:
         cur = conn.cursor()
         # Correct the query to pass all parameters dynamically
-        cur.execute("CALL inserir_quartos(%s, %s, %s, %s);", (p_numeroquarto, p_precoquarto, p_ocupado, p_tipoquarto))
+        cur.execute("CALL inserir_quartos(%s, %s, %s, %s);", (p_numeroquarto, p_precoquarto, p_tipoquarto))
         conn.commit()
         cur.close()
         conn.close()
@@ -158,7 +158,7 @@ def registar_quarto():
         data = request.get_json()
 
         # Validate input parameters
-        if not all(k in data for k in ["p_numeroquarto", "p_precoquarto", "p_ocupado", "p_tipoquarto"]):
+        if not all(k in data for k in ["p_numeroquarto", "p_precoquarto", "p_tipoquarto"]):
             logging.error("Faltam parametros!")
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
@@ -176,7 +176,6 @@ def registar_quarto():
         message = insert_quarto(
             data['p_numeroquarto'],
             data['p_precoquarto'],
-            data['p_ocupado'],
             data['p_tipoquarto']
         )
 
