@@ -19,23 +19,29 @@ def hello_world():
     return 'Hello, World!'
 
 # caminho para ir buscar as variaveis de ambiente
-@app.route('/env')
-def print_env_vars():
-    env_vars = {
-        "db_host": os.getenv("db_host"),
-        "db_database": os.getenv("db_database"),
-        "db_user": os.getenv("db_user"),
-        "db_password": os.getenv("db_password")
-    }
-    return jsonify(env_vars), OK_CODE
 
+#@app.route('/env')
+#def print_env_vars():
+ #   env_vars = {
+  #      "db_host": os.getenv("db_host"),
+   #     "db_database": os.getenv("db_database"),
+    #    "db_user": os.getenv("db_user"),
+     #   "db_password": os.getenv("db_password")
+    #}
+    #return jsonify(env_vars), OK_CODE
+#
 # Função para conectar na base de dados
+
 def get_db_connection():
     # buscar as variaveis de ambiente
-    host = os.getenv("db_host")
-    database = os.getenv("db_database")
-    user = os.getenv("db_user")
-    password = os.getenv("db_password")
+    host = "localhost"
+    database = "bd2"
+    user =  "postgres"
+    password = "postgres"
+    #host = os.getenv("db_host")
+    #database = os.getenv("db_database")
+    #user = os.getenv("db_user")
+    #password = os.getenv("db_password")
 
     # Verifica se todas as variáveis de ambiente existem
     if not all([host , database, user, password]):
@@ -63,7 +69,7 @@ def insert_user(nome, email, nif, senha, numerotelefone):
     try:
         cur = conn.cursor()
         #procidure inserir_utilizadores
-        cur.execute("CALL inserir_utilizadores(%s, %s, %s, %s, %s);", (nome, email, nif, senha, numerotelefone))
+        cur.execute("CALL inserir_clientes(%s, %s, %s, %s, %s);", (nome, email, nif, senha, numerotelefone))
         conn.commit()
         cur.close()
         conn.close()
@@ -117,9 +123,73 @@ def insert_reserva(p_idcliente, p_idquarto, p_datacheckin,p_datacheckout):
         return "Reserva feita feita com sucesso!"
     except Exception as e:
         return str(e)
+    
+def mudarPrecoQuarto(p_idquarto, p_precoQuarto):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erro de conexão com a base de dados."
 
-@app.route('/inserir_emp', methods=['POST'])
-def register_emp():
+    try:
+        cur = conn.cursor()
+        cur.execute("CALL atualizar_precoQuarto(%s, %s);", (p_idquarto, p_precoQuarto))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return "Preco do quarto alterado com sucesso!"
+    except Exception as e:
+        return str(e)
+    
+def mudarTipoQuarto(p_idquarto, p_tipoquarto):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erro de conexão com a base de dados."
+    if p_tipoquarto not in ["casal", "solteiro"]:
+        return "Tipo de quarto invalido!"
+    try:
+        cur = conn.cursor()
+        if p_tipoquarto == "casal":
+            cur.execute("CALL atualizar_tipocasal(%s);", (p_idquarto,))
+        elif p_tipoquarto == "solteiro":
+            cur.execute("CALL atualizar_tiposolteiro(%s);", (p_idquarto,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return "Tipo do quarto alterado com sucesso!"
+    except Exception as e:
+        if conn:
+            conn.close()
+        return f"Erro ao alterar tipo do quarto: {str(e)}"
+    
+def get_ImagensQuarto(p_idquarto):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erro de conexão com a base de dados."
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * from get_imagensQuarto(%s);", (p_idquarto))
+        imagens = cur.fetchall()
+        cur.close()
+        conn.close()
+        return imagens
+    except Exception as e:
+        return str(e)
+    
+def upload_imagem_quarto(p_idquarto, p_imagem):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erro de conexão com a base de dados."
+    try:
+        cur = conn.cursor()
+        cur.execute("CALL inserir_imagem(%s, %s);", (p_idquarto, p_imagem))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return "Imagem do quarto carregada com sucesso!"
+    except Exception as e:
+        return str(e)
+
+@app.route('/registar_emp', methods=['POST'])
+def registar_emp():
     try:
         data = request.get_json()
         #debug de erros descomentar quando estiver a dar treta
@@ -285,7 +355,7 @@ def quarto_exists(p_numeroquarto):
         return False  # Retorna False caso haja erro na execução da consulta
 
 # Caminho para registrar um novo utilziador
-@app.route('/register', methods=['POST'])
+@app.route('/registar_utilizador', methods=['POST'])
 def register():
     try:
         data = request.get_json()
@@ -362,6 +432,108 @@ def login():
         logging.error(f"Login error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
+@app.route('/mudarPrecoQuarto', methods=['POST'])
+def mudarprecoquarto():
+    try:
+        data = request.get_json()
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idquarto", "p_precoQuarto"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para mudar o preço do quarto
+        message = mudarPrecoQuarto(
+            data['p_idquarto'],
+            data['p_precoQuarto']
+        )
+
+        if "Preco do quarto alterado com sucesso!" in message:
+            logging.info("Preco do quarto alterado com sucesso!")
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"Erro ao alterar preco do quarto: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+
+@app.route('/mudarTipoQuarto', methods=['POST'])
+def mudartipoquarto():
+    try:
+        data = request.get_json()
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idquarto", "p_tipoquarto"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para mudar o tipo do quarto
+        message = mudarTipoQuarto(
+            data['p_idquarto'],
+            data['p_tipoquarto']
+        )
+
+        if "Tipo do quarto alterado com sucesso!" in message:
+            logging.info("Tipo do quarto alterado com sucesso!")
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"Erro ao alterar tipo do quarto: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+
+@app.route('/get_ImagensQuarto', methods=['POST'])
+def get_imagens_quarto():
+    try:
+        data = request.get_json()
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idquarto"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para obter as imagens do quarto
+        imagens = get_ImagensQuarto(
+            data['p_idquarto']
+        )
+
+        if imagens:
+            logging.info("Imagens do quarto obtidas com sucesso!")
+            return jsonify({"imagens": imagens}), OK_CODE
+        else:
+            logging.error("Erro ao obter imagens do quarto.")
+            return jsonify({"error": "Erro ao obter imagens do quarto."}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+
+@app.route('/upload_imagem_quarto', methods=['POST'])
+def upload_imagem_quarto_route():
+    try:
+        data = request.get_json()
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idquarto", "p_imagem"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para fazer o upload da imagem do quarto
+        message = upload_imagem_quarto(
+            data['p_idquarto'],
+            data['p_imagem']
+        )
+
+        if "Imagem do quarto carregada com sucesso!" in message:
+            logging.info("Imagem do quarto carregada com sucesso!")
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"Erro ao carregar imagem do quarto: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 # Execução do aplicativo Flask
 if __name__ == '__main__':
