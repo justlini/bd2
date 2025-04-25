@@ -188,6 +188,20 @@ def upload_imagem_quarto(p_idquarto, p_imagem):
     except Exception as e:
         return str(e)
 
+def ver_disponibilidade_quarto():
+    conn = get_db_connection()
+    if conn is None:
+        return "Erro de conexão com a base de dados."
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * from verdisponibilidadequarto;")
+        disponibilidade = cur.fetchall()
+        cur.close()
+        conn.close()
+        return disponibilidade
+    except Exception as e:
+        return str(e)
+
 @app.route('/registar_emp', methods=['POST'])
 def registar_emp():
     try:
@@ -531,6 +545,15 @@ def upload_imagem_quarto_route():
         else:
             logging.error(f"Erro ao carregar imagem do quarto: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+
+@app.route('/ver_disponibilidade_quarto', methods=['GET'])
+def ver_disponibilidade_quarto_route():
+    try:
+        disponibilidade = ver_disponibilidade_quarto()
+        return jsonify({"disponibilidade": disponibilidade}), OK_CODE
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
