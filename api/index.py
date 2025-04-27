@@ -258,7 +258,6 @@ def mudarprecoquarto():
         data = request.get_json()
         
         user = get_jwt_identity()
-        logging.debug(f"user from token: {user}")
         
         if user['tipo'] != 'admin':
             logging.error("Unauthorized access attempt.")
