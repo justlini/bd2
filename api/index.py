@@ -1,17 +1,29 @@
 import os
 import psycopg2
-from flask import Flask, jsonify, request  
+from flask import Flask, jsonify, request
+from flask_jwt_extended import JWTManager,jwt_required, get_jwt_identity,create_access_token
+from conn import BaseDeDados
+from utilizadores import Utilizadores
+from quartos import ManageQuartos
+from reservas import ManageReservas
 import logging
+import bcrypt
 
 # Configuração do Flask
 app = Flask(__name__)
-
+app.config['JWT_SECRET_KEY'] = 'olamundo' #os.getenv('JWT_SECRET')
+jwt = JWTManager(app)
+utilizadores = Utilizadores()
+manageQuartos = ManageQuartos()
+manageReservas = ManageReservas()
 # Códigos HTTP
 OK_CODE = 200
 BAD_REQUEST = 400
 CONFLICT = 409
 INTERNAL_SERVER_ERROR = 500
 CREATED = 201
+
+bd = BaseDeDados()
 
 # Rota de teste
 @app.route('/')
@@ -29,178 +41,6 @@ def hello_world():
      #   "db_password": os.getenv("db_password")
     #}
     #return jsonify(env_vars), OK_CODE
-#
-# Função para conectar na base de dados
-
-def get_db_connection():
-    # buscar as variaveis de ambiente
-    host = "localhost"
-    database = "bd2"
-    user =  "postgres"
-    password = "postgres"
-    #host = os.getenv("db_host")
-    #database = os.getenv("db_database")
-    #user = os.getenv("db_user")
-    #password = os.getenv("db_password")
-
-    # Verifica se todas as variáveis de ambiente existem
-    if not all([host , database, user, password]):
-        return None  # Retorna None se faltar alguma variável
-
-    try:
-        # Conecta à base de dados
-        connection = psycopg2.connect(
-            host=host,
-            database=database,
-            user=user,
-            password=password
-        )
-        return connection  # Retorna a conexão
-    except Exception as e:
-        print(f"Erro ao ciionectar à base de dados: {str(e)}")
-        return None
-
-def insert_user(nome, email, nif, senha, numerotelefone):
-    conn = get_db_connection()
-    #se a conexaõ for None retorna um erro de conexão
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-    
-    try:
-        cur = conn.cursor()
-        #procidure inserir_utilizadores
-        cur.execute("CALL inserir_clientes(%s, %s, %s, %s, %s);", (nome, email, nif, senha, numerotelefone))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return "Utilizador inserido com sucesso!"
-    except Exception as e:
-        return str(e)
-
-def insert_emp(idemp, tipoemp, idcliente):
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-
-    try:
-        cur = conn.cursor()
-        cur.execute("CALL inserir_emp(%s, %s, %s);", (idemp, tipoemp, idcliente))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return "Empregado inserirdo com sucesso!"
-    except Exception as e:
-        return str(e)
-
-
-def insert_quarto(p_numeroquarto, p_precoquarto, p_tipoquarto):
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-
-    try:
-        cur = conn.cursor()
-        # Correct the query to pass all parameters dynamically
-        cur.execute("CALL inserir_quartos(%s, %s, %s);", (p_numeroquarto, p_precoquarto, p_tipoquarto))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return "Quarto inserido com sucesso!"
-    except Exception as e:
-        return str(e)
-    
-def insert_reserva(p_idcliente, p_idquarto, p_datacheckin,p_datacheckout):
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-
-    try:
-        cur = conn.cursor()
-        cur.execute("CALL inserir_reserva(%s, %s, %s,%s);", (p_idcliente, p_idquarto, p_datacheckin,p_datacheckout))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return "Reserva feita feita com sucesso!"
-    except Exception as e:
-        return str(e)
-    
-def mudarPrecoQuarto(p_idquarto, p_precoQuarto):
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-
-    try:
-        cur = conn.cursor()
-        cur.execute("CALL atualizar_precoQuarto(%s, %s);", (p_idquarto, p_precoQuarto))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return "Preco do quarto alterado com sucesso!"
-    except Exception as e:
-        return str(e)
-    
-def mudarTipoQuarto(p_idquarto, p_tipoquarto):
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-    if p_tipoquarto not in ["casal", "solteiro"]:
-        return "Tipo de quarto invalido!"
-    try:
-        cur = conn.cursor()
-        if p_tipoquarto == "casal":
-            cur.execute("CALL atualizar_tipocasal(%s);", (p_idquarto,))
-        elif p_tipoquarto == "solteiro":
-            cur.execute("CALL atualizar_tiposolteiro(%s);", (p_idquarto,))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return "Tipo do quarto alterado com sucesso!"
-    except Exception as e:
-        if conn:
-            conn.close()
-        return f"Erro ao alterar tipo do quarto: {str(e)}"
-    
-def get_ImagensQuarto(p_idquarto):
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT * from get_imagensQuarto(%s);", (p_idquarto))
-        imagens = cur.fetchall()
-        cur.close()
-        conn.close()
-        return imagens
-    except Exception as e:
-        return str(e)
-    
-def upload_imagem_quarto(p_idquarto, p_imagem):
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-    try:
-        cur = conn.cursor()
-        cur.execute("CALL inserir_imagem(%s, %s);", (p_idquarto, p_imagem))
-        conn.commit()
-        cur.close()
-        conn.close()
-        return "Imagem do quarto carregada com sucesso!"
-    except Exception as e:
-        return str(e)
-
-def ver_disponibilidade_quarto():
-    conn = get_db_connection()
-    if conn is None:
-        return "Erro de conexão com a base de dados."
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT * from verdisponibilidadequarto;")
-        disponibilidade = cur.fetchall()
-        cur.close()
-        conn.close()
-        return disponibilidade
-    except Exception as e:
-        return str(e)
 
 @app.route('/registar_emp', methods=['POST'])
 def registar_emp():
@@ -217,7 +57,7 @@ def registar_emp():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         #verificar se o empregado já exsite
-        if emp_exists(data["idemp"], data["idcliente"]):
+        if utilizadores.emp_exists(data["idemp"], data["idcliente"]):
             logging.error("Empregado com este ID já existe")
             logging.error("Utilizador com este mail ou NIF já existe!")
 
@@ -232,7 +72,7 @@ def registar_emp():
             return jsonify({"error": "Tipo de mepregado invalido!"}), BAD_REQUEST
 
         #formato do body json esperado
-        message = insert_emp(
+        message = utilizadores.insert_emp(
             data['idemp'],
             data['tipoemp'],
             data['idcliente']
@@ -262,7 +102,7 @@ def registar_quarto():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # Check if the room already exists
-        if quarto_exists(data["p_numeroquarto"]):
+        if manageQuartos.quarto_exists(data["p_numeroquarto"]):
             logging.error("Quarto com esse numero já existe!")
             return jsonify({"error": "Quarto com esse numero já existe!"}), CONFLICT
 
@@ -272,7 +112,7 @@ def registar_quarto():
             return jsonify({"error": "Tipo de quarto invalido!"}), BAD_REQUEST
 
         # Call the insert_quarto function
-        message = insert_quarto(
+        message = manageQuartos.insert_quarto(
             data['p_numeroquarto'],
             data['p_precoquarto'],
             data['p_tipoquarto']
@@ -300,7 +140,7 @@ def registar_reserva():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # chamar funcao para fazer reserva com o body formato para o postman
-        message = insert_reserva(
+        message = manageReservas.insert_reserva(
             data['p_idcliente'],
             data['p_idquarto'],
             data['p_datacheckin'],
@@ -317,56 +157,7 @@ def registar_reserva():
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
-# Função para verificar se o empregado já existe
-def emp_exists(idemp, idcliente):
-    conn = get_db_connection()
-    if conn is None:
-        return False  # Se não conseguir se conectar ao banco, assume que o usuário não existe
-    
-    try:
-        cur = conn.cursor()
-        query = "SELECT 1 FROM public.emp WHERE idemp = %s OR idcliente = %s LIMIT 1"
-        cur.execute(query, (idemp, idcliente))
-        result = cur.fetchone()
-        cur.close()
-        conn.close()
-        return result is not None  # Retorna True se o utilizador existir
-    except Exception as e:
-        return False  # Retorna False caso haja erro na execução da consulta
 
-# Função para verificar se o utilizador já existe
-def user_exists(email, nif):
-    conn = get_db_connection()
-    if conn is None:
-        return False  # Se não conseguir se conectar na base de dados, assume que o utilizador não existe
-    
-    try:
-        cur = conn.cursor()
-        query = "SELECT 1 FROM public.utilizadores WHERE email = %s OR nif = %s LIMIT 1"
-        cur.execute(query, (email, nif))
-        result = cur.fetchone()
-        cur.close()
-        conn.close()
-        return result is not None  # Retorna True se o utilizador existir
-    except Exception as e:
-        return False  # Retorna False caso haja erro na execução da consultaº
-
-# Função para verificar se o quarto já existe
-def quarto_exists(p_numeroquarto):
-    conn = get_db_connection()
-    if conn is None:
-        return False  # Se não conseguir se conectar na base de dados, assume que o utilizador não existe
-
-    try:
-        cur = conn.cursor()
-        query = "SELECT 1 FROM public.quartos WHERE p_numeroquarto = %s LIMIT 1"
-        cur.execute(query, (p_numeroquarto))
-        result = cur.fetchone()
-        cur.close()
-        conn.close()
-        return result is not None  # Retorna True se o quarto existir
-    except Exception as e:
-        return False  # Retorna False caso haja erro na execução da consulta
 
 # Caminho para registrar um novo utilziador
 @app.route('/registar_utilizador', methods=['POST'])
@@ -375,20 +166,27 @@ def register():
         data = request.get_json()
 
         logging.debug(f"Received data: {data}")
+        
 
         if not all(k in data for k in ["nome", "email", "nif", "senha", "numerotelefone"]):
             logging.error("Missing required parameters.")
             return jsonify({"error": "Missing required parameters"}), BAD_REQUEST
 
-        if user_exists(data["email"], data["nif"]):
+        if utilizadores.user_exists(data["email"], data["nif"]):
             logging.error("User with this email or NIF already exists.")
+            logging.error("Empregado com este ID já existe")
+            logging.error("Utilizador com este mail ou NIF já existe!")
             return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
+        
+        hashar_password = bcrypt.hashpw(data['senha'].encode('utf-8'), bcrypt.gensalt())
+    
 
-        message = insert_user(
+        message = utilizadores.insert_user(
             data['nome'], 
             data['email'], 
             data['nif'], 
-            data['senha'], 
+            #data['senha'],
+            hashar_password.decode('utf-8'), # Descomentar se quiser usar a senha hasheada
             data['numerotelefone']
         )
 
@@ -417,28 +215,35 @@ def login():
             return jsonify({"error": "Missing email or password"}), BAD_REQUEST
 
         # Conexão com o banco
-        conn = get_db_connection()
+        conn = bd.get_conn()
         if conn is None:
             logging.error("Database connection failed.")
             return jsonify({"error": "Database connection failed"}), INTERNAL_SERVER_ERROR
 
         cur = conn.cursor()
-        query = "SELECT idcliente, nome, email FROM public.utilizadores WHERE email = %s AND senha = %s"
-        cur.execute(query, (data["email"], data["senha"]))
+        query = """
+            SELECT u.idcliente, u.nome, u.email, u.senha, e.tipoemp
+            FROM public.utilizadores u
+            LEFT JOIN public.emp e ON u.idcliente = e.idcliente
+            WHERE u.email = %s;
+        """
+        cur.execute(query, (data["email"],))
         user = cur.fetchone()
 
         cur.close()
         conn.close()
 
-        if user:
+        if user and bcrypt.checkpw(data['senha'].encode('utf-8'), user[3].encode('utf-8')):
             # Login bem-sucedido
             user_data = {
-                "idcliente": user[0],
-                "nome": user[1],
-                "email": user[2]
+                "idcliente": str(user[0]),
+                "nome": str(user[1]),
+                "email": str(user[2]),
+                "tipo": str(user[4]) if user[4] else "cliente"  # Se não for admin, define como cliente
             }
+            token = create_access_token(identity=user_data)
             logging.info(f"User {user[2]} logged in successfully.")
-            return jsonify({"message": "Login successful", "user": user_data}), OK_CODE
+            return jsonify({"message": "Login successful", "access_token": token, "user": user_data}), OK_CODE
         else:
             logging.warning("Invalid email or password.")
             return jsonify({"error": "Invalid email or password"}), BAD_REQUEST
@@ -447,9 +252,17 @@ def login():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 @app.route('/mudarPrecoQuarto', methods=['POST'])
+@jwt_required()
 def mudarprecoquarto():
     try:
         data = request.get_json()
+        
+        user = get_jwt_identity()
+        logging.debug(f"user from token: {user}")
+        
+        if user['tipo'] != 'admin':
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
 
         # Validar os parâmetros de entrada
         if not all(k in data for k in ["p_idquarto", "p_precoQuarto"]):
@@ -457,7 +270,7 @@ def mudarprecoquarto():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # Chamar a função para mudar o preço do quarto
-        message = mudarPrecoQuarto(
+        message = manageQuartos.mudarPrecoQuarto(
             data['p_idquarto'],
             data['p_precoQuarto']
         )
@@ -483,7 +296,7 @@ def mudartipoquarto():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # Chamar a função para mudar o tipo do quarto
-        message = mudarTipoQuarto(
+        message = manageQuartos.mudarTipoQuarto(
             data['p_idquarto'],
             data['p_tipoquarto']
         )
@@ -509,7 +322,7 @@ def get_imagens_quarto():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # Chamar a função para obter as imagens do quarto
-        imagens = get_ImagensQuarto(
+        imagens = manageQuartos.get_ImagensQuarto(
             data['p_idquarto']
         )
 
@@ -534,7 +347,7 @@ def upload_imagem_quarto_route():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # Chamar a função para fazer o upload da imagem do quarto
-        message = upload_imagem_quarto(
+        message = manageQuartos.upload_imagem_quarto(
             data['p_idquarto'],
             data['p_imagem']
         )
@@ -552,7 +365,7 @@ def upload_imagem_quarto_route():
 @app.route('/ver_disponibilidade_quarto', methods=['GET'])
 def ver_disponibilidade_quarto_route():
     try:
-        disponibilidade = ver_disponibilidade_quarto()
+        disponibilidade = manageQuartos.ver_disponibilidade_quarto()
         return jsonify({"disponibilidade": disponibilidade}), OK_CODE
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
