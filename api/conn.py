@@ -3,14 +3,13 @@ import os
 
 class BaseDeDados:
     def __init__(self):
-        self.host = os.getenv("db_host", "localhost")
-        self.database = os.getenv("db_database", "bd2")
-        self.user = os.getenv("db_user", "postgres")
-        self.password = os.getenv("db_password", "postgres")
-        #host = os.getenv("db_host")
-        #database = os.getenv("db_database")
-        #user = os.getenv("db_user")
-        #password = os.getenv("db_password")
+        #self.host = os.getenv("db_host", "localhost")
+        #self.user = os.getenv("db_user", "postgres")
+        #self.password = os.getenv("db_password", "postgres")
+        self.host = os.getenv("db_host")
+        self.database = os.getenv("db_database")
+        self.user = os.getenv("db_user")
+        self.password = os.getenv("db_password")
 
     def get_conn(self):
         # Verifica se todas as variáveis de ambiente existem
