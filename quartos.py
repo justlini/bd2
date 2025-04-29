@@ -90,7 +90,7 @@ class ManageQuartos:
             result = cur.fetchone()
             cur.close()
             conn.close()
-            return result is not None  # Retorna True se o quarto existir
+            return result[0] if result else False  # Retorna True se o quarto existir
         except Exception as e:
             return False  # Retorna False caso haja erro na execução da consulta
         
