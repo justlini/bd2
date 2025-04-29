@@ -32,15 +32,15 @@ def hello_world():
 
 # caminho para ir buscar as variaveis de ambiente
 
-#@app.route('/env')
-#def print_env_vars():
- #   env_vars = {
-  #      "db_host": os.getenv("db_host"),
-   #     "db_database": os.getenv("db_database"),
-    #    "db_user": os.getenv("db_user"),
-     #   "db_password": os.getenv("db_password")
-    #}
-    #return jsonify(env_vars), OK_CODE
+@app.route('/env')
+def print_env_vars():
+    env_vars = {
+        "db_host": os.getenv("db_host"),
+        "db_database": os.getenv("db_database"),
+        "db_user": os.getenv("db_user"),
+        "db_password": os.getenv("db_password")
+    }
+    return jsonify(env_vars), OK_CODE
 
 @app.route('/registar_emp', methods=['POST'])
 def registar_emp():
@@ -190,8 +190,8 @@ def register():
             data['numerotelefone']
         )
 
-        if "User inserted successfully!" in message:
-            logging.info("User inserted successfully.")
+        if "Utilizador inserido com sucesso!" in message:
+            logging.info("Utilizador inserido com sucesso!")
             return jsonify({"message": message}), CREATED
         else:
             logging.error(f"Error inserting user: {message}")
