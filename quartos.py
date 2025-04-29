@@ -1,4 +1,4 @@
-from bd2.api.conn import BaseDeDados
+from api.conn import BaseDeDados
 
 class ManageQuartos:
     def __init__(self):

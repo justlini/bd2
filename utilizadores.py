@@ -1,4 +1,4 @@
-from bd2.api.conn import BaseDeDados
+from api.conn import BaseDeDados
 import bcrypt
 class Utilizadores:
     
