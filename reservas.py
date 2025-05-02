@@ -33,4 +33,20 @@ class ManageReservas:
             return "Reserva paga com sucesso!"
         except Exception as e:
             return str(e)
+        
+    def cancelar_reserva(self,p_idreserva):
+        conn = self.bd.get_conn()
+        if conn is None:
+            return "Erro ligação a base de dados."
+        
+        try:
+            cur = conn.cursor()
+            cur.execute("Select * from cancelar_reserva(%s);", (p_idreserva,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return "Reserva cancelada com sucesso!"
+        except Exception as e:
+            return str(e)
+        
     

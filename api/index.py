@@ -396,6 +396,38 @@ def pagar_reserva():
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+@app.route('/cancelar_reserva', methods=['POST'])
+@jwt_required()
+def cancelar_reserva():
+    try:
+        data = request.get_json()
+        
+        user = get_jwt_identity()
+        
+        if user['tipo'] not in ['admin', 'rececionista']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idreserva"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para pagar a reserva
+        message = manageReservas.cancelar_reserva(
+            data['p_idreserva']
+        )
+
+        if "Reserva paga com sucesso!" in message:
+            logging.info("Reserva paga com sucesso!")
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"Erro ao pagar reserva: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 # Execução do aplicativo Flask
 if __name__ == '__main__':
