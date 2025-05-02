@@ -6,6 +6,7 @@ from api.conn import BaseDeDados
 from utilizadores import Utilizadores
 from quartos import ManageQuartos
 from reservas import ManageReservas
+from transacoes import ManageTransacoes
 import logging
 import bcrypt
 
@@ -501,7 +502,7 @@ def ver_pagamentos():
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
         
         # Chamar a função para ver todos os pagamentos
-        pagamentos = manageReservas.ver_pagamentos()
+        pagamentos = ManageTransacoes.ver_pagamentos()
 
         if pagamentos:
             logging.info("Todos os pagamentos obtidos com sucesso!")
