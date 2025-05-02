@@ -537,7 +537,7 @@ def ver_pagamentos_cliente():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # Chamar a função para ver os pagamentos do cliente
-        pagamentos = manageTransacoes.ver_pagamentos_cliente(
+        pagamentos = manageTransacoes.verpagamentos_cliente(
             data['p_idcliente']
         )
 

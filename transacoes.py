@@ -20,7 +20,7 @@ class ManageTransacoes:
         except Exception as e:
             return str(e)
 
-    def ver_pagamentos_cliente(self, p_idcliente):
+    def verpagamentos_cliente(self, p_idcliente):
         conn = self.bd.get_conn()
         if conn is None:
             return "Erro de conexão com a base de dados."
