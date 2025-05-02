@@ -429,6 +429,43 @@ def cancelar_reserva():
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
+@app.route('/ver_reservasCliente', methods=['POST'])
+@jwt_required()
+def ver_reservas_cliente():
+    try:
+        data = request.get_json()
+        
+        user = get_jwt_identity()
+        
+        if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+        
+        if user['tipo'] == 'cliente' and data['p_idcliente'] != user['idcliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idcliente"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para ver as reservas do cliente
+        reservas = manageReservas.ver_reservasCliente(
+            data['p_idcliente']
+        )
+
+        if reservas:
+            logging.info("Reservas do cliente obtidas com sucesso!")
+            return jsonify({"reservas": reservas}), OK_CODE
+        else:
+            logging.error("Erro ao obter reservas do cliente.")
+            return jsonify({"error": "Erro ao obter reservas do cliente."}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+
 # Execução do aplicativo Flask
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
