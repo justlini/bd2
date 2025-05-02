@@ -78,4 +78,19 @@ class ManageReservas:
             return reservas
         except Exception as e:
             return str(e)
+        
+    def ver_pagamentos(self):
+        conn = self.bd.get_conn()
+        if conn is None:
+            return "Erro de conexão com a base de dados."
+
+        try:
+            cur = conn.cursor()
+            cur.execute("Select * from ver_todas_transacoes;")
+            pagamentos = cur.fetchall()
+            cur.close()
+            conn.close()
+            return pagamentos
+        except Exception as e:
+            return str(e)
     
