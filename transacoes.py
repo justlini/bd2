@@ -1,9 +1,7 @@
 from api.conn import BaseDeDados
 
 
-
 class ManageTransacoes:
-    
     def __init__(self):
         self.bd = BaseDeDados()
 
@@ -21,4 +19,20 @@ class ManageTransacoes:
             return pagamentos
         except Exception as e:
             return str(e)
+
+    def ver_pagamentos_cliente(self, p_idcliente):
+        conn = self.bd.get_conn()
+        if conn is None:
+            return "Erro de conexão com a base de dados."
+
+        try:
+            cur = conn.cursor()
+            cur.execute("Select * from vertransacoes_cliente(%s);", (p_idcliente,))
+            pagamentos = cur.fetchall()
+            cur.close()
+            conn.close()
+            return pagamentos
+        except Exception as e:
+            return str(e)
+        
         
