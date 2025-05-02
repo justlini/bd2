@@ -65,6 +65,7 @@ class Utilizadores:
             return result[0] if result else False  # Retorna True se o utilizador existir
         except Exception as e:
             return False  # Retorna False caso haja erro na execução da consultaº
+        
     
         
 

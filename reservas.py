@@ -63,4 +63,19 @@ class ManageReservas:
             return reservas
         except Exception as e:
             return str(e)
+        
+    def ver_todasReservas(self):
+        conn = self.bd.get_conn()
+        if conn is None:
+            return "Erro de conexão com a base de dados."
+
+        try:
+            cur = conn.cursor()
+            cur.execute("Select * from reservas_admin();")
+            reservas = cur.fetchall()
+            cur.close()
+            conn.close()
+            return reservas
+        except Exception as e:
+            return str(e)
     

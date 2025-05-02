@@ -465,6 +465,29 @@ def ver_reservas_cliente():
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+@app.route('/ver_todasReservas', methods=['POST'])
+@jwt_required()
+def ver_todas_reservas():
+    try:
+        user = get_jwt_identity()
+        
+        if user['tipo'] not in ['admin']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+
+        # Chamar a função para ver todas as reservas
+        reservas = manageReservas.ver_todasReservas()
+
+        if reservas:
+            logging.info("Todas as reservas obtidas com sucesso!")
+            return jsonify({"reservas": reservas}), OK_CODE
+        else:
+            logging.error("Erro ao obter todas as reservas.")
+            return jsonify({"error": "Erro ao obter todas as reservas."}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 # Execução do aplicativo Flask
 if __name__ == '__main__':
