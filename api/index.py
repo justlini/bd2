@@ -17,6 +17,7 @@ jwt = JWTManager(app)
 utilizadores = Utilizadores()
 manageQuartos = ManageQuartos()
 manageReservas = ManageReservas()
+manageTransacoes = ManageTransacoes()
 # Códigos HTTP
 OK_CODE = 200
 BAD_REQUEST = 400
@@ -502,7 +503,7 @@ def ver_pagamentos():
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
         
         # Chamar a função para ver todos os pagamentos
-        pagamentos = ManageTransacoes.ver_pagamentos()
+        pagamentos = manageTransacoes.ver_pagamentos()
 
         if pagamentos:
             logging.info("Todos os pagamentos obtidos com sucesso!")
