@@ -12,7 +12,7 @@ import bcrypt
 
 # Configuração do Flask
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = 'olamundo' #os.getenv('JWT_SECRET')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 jwt = JWTManager(app)
 utilizadores = Utilizadores()
 manageQuartos = ManageQuartos()
