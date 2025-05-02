@@ -71,7 +71,7 @@ class ManageReservas:
 
         try:
             cur = conn.cursor()
-            cur.execute("Select * from reservas_admin();")
+            cur.execute("Select * from reservas_admin;")
             reservas = cur.fetchall()
             cur.close()
             conn.close()
