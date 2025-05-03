@@ -509,7 +509,9 @@ def ver_pagamentos():
             logging.info("Todos os pagamentos obtidos com sucesso!")
             return jsonify({"pagamentos": pagamentos}), OK_CODE
         else:
+            logging.error("Erro ao obter todos os upagamentos.")
             logging.error("Erro ao obter todos os pagamentos.")
+            # erro no postman
             return jsonify({"error": "Erro ao obter todos os pagamentos."}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
