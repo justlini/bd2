@@ -9,7 +9,7 @@ from reservas import ManageReservas
 from transacoes import ManageTransacoes
 from bp_reservas import reservas_bp
 import logging
-
+import bcrypt
 
 # Configuração do Flask
 app = Flask(__name__)
