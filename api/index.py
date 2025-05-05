@@ -31,23 +31,7 @@ CREATED = 201
 
 bd = BaseDeDados()
 
-# Rota de teste
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
-
 # caminho para ir buscar as variaveis de ambiente
-
-@app.route('/env')
-def print_env_vars():
-    env_vars = {
-        "db_host": os.getenv("db_host"),
-        "db_database": os.getenv("db_database"),
-        "db_user": os.getenv("db_user"),
-        "db_password": os.getenv("db_password")
-    }
-    return jsonify(env_vars), OK_CODE
-
 
 app.register_blueprint(reservas_bp)
 app.register_blueprint(transacoes_bp)
