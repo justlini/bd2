@@ -5,12 +5,12 @@ import logging
 from reservas import ManageReservas
 
 # Create the Blueprint
-reservas_bp = Blueprint('reservas', __name__)  # Ensure the name matches
+bp_reservas = Blueprint('reservas', __name__)
 
 manageReservas = ManageReservas()
 
 # Define the route using the Blueprint
-@reservas_bp.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
+@bp_reservas.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
