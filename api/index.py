@@ -2,7 +2,7 @@ import os
 import psycopg2
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager,jwt_required, get_jwt_identity,create_access_token
-from bp_reservas import reservas_bp
+from api.bp_reservas import reservas_bp
 from api.conn import BaseDeDados
 from utilizadores import Utilizadores
 from quartos import ManageQuartos
