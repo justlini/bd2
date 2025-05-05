@@ -135,7 +135,7 @@ def registar_reserva(id_cliente,id_quarto):
         data = request.get_json()
 
         # validar os parametros de entrada
-        if not all(k in data for k in ["p_idcliente", "p_idquarto", "p_datacheckin", "p_datacheckout"]):
+        if not all(k in data for k in ["p_datacheckin", "p_datacheckout"]):
             logging.error("Faltam parametros!")
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
