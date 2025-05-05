@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token
 from api.conn import BaseDeDados
 import logging
 from utilizadores import Utilizadores
@@ -107,4 +108,49 @@ def register():
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+
+@utilizadores_bp.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+
+        # Log dos dados recebidos
+        logging.debug(f"Login data received: {data}")
+
+        # Verifica se email e senha estão presentes
+        if not all(k in data for k in ["email", "senha"]):
+            logging.error("Missing email or password.")
+            return jsonify({"error": "Missing email or password"}), BAD_REQUEST
+
+        # Conexão com o banco
+        conn = bd.get_conn()
+        if conn is None:
+            logging.error("Database connection failed.")
+            return jsonify({"error": "Database connection failed"}), INTERNAL_SERVER_ERROR
+
+        cur = conn.cursor()
+        cur.execute("Select * from public.get_userData(%s)", (data["email"],))
+        user = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        if user and bcrypt.checkpw(data['senha'].encode('utf-8'), user[3].encode('utf-8')):
+            # Login bem-sucedido
+            user_data = {
+                "idcliente": str(user[0]),
+                "nome": str(user[1]),
+                "email": str(user[2]),
+                "tipo": str(user[4]) if user[4] else "cliente"  # Se não for admin, define como cliente
+            }
+            token = create_access_token(identity=user_data)
+            logging.info(f"User {user[2]} logged in successfully.")
+            return jsonify({"message": "Login successful", "access_token": token, "user": user_data}), OK_CODE
+        else:
+            logging.warning("Invalid email or password.")
+            return jsonify({"error": "Invalid email or password"}), BAD_REQUEST
+    except Exception as e:
+        logging.error(f"Login error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
