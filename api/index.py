@@ -371,18 +371,11 @@ def ver_disponibilidade_quarto_route():
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
-        data = request.get_json()
-        
         user = get_jwt_identity()
         
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
-
-        # Validar os parâmetros de entrada
-        if not all(k in data for k in ["p_idreserva"]):
-            logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # Chamar a função para pagar a reserva
         message = manageReservas.pagar_reserva(id_reserva)
