@@ -6,16 +6,18 @@ from api.conn import BaseDeDados
 from utilizadores import Utilizadores
 from quartos import ManageQuartos
 from reservas import ManageReservas
+from transacoes import ManageTransacoes
 import logging
 import bcrypt
 
 # Configuração do Flask
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = 'olamundo' #os.getenv('JWT_SECRET')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 jwt = JWTManager(app)
 utilizadores = Utilizadores()
 manageQuartos = ManageQuartos()
 manageReservas = ManageReservas()
+manageTransacoes = ManageTransacoes()
 # Códigos HTTP
 OK_CODE = 200
 BAD_REQUEST = 400
@@ -129,35 +131,33 @@ def registar_quarto():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
     
     
-@app.route('/reserva/<int:id_cliente>/<int:id_quarto>/inserir', methods=['POST'])
-def registar_reserva(id_cliente, id_quarto):
+@app.route('/inserir_reserva', methods=['POST'])
+def registar_reserva():
     try:
         data = request.get_json()
 
         # validar os parametros de entrada
-        if not all(k in data for k in ["p_datacheckin", "p_datacheckout"]):
+        if not all(k in data for k in ["p_idcliente", "p_idquarto", "p_datacheckin", "p_datacheckout"]):
             logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), 400  # BAD_REQUEST
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
-        # chamar funcao para fazer reserva
+        # chamar funcao para fazer reserva com o body formato para o postman
         message = manageReservas.insert_reserva(
-            id_cliente,
-            id_quarto,
+            data['p_idcliente'],
+            data['p_idquarto'],
             data['p_datacheckin'],
             data['p_datacheckout']
         )
 
         if "Reserva feita feita com sucesso!" in message:
-            logging.info("reserva inserida com sucesso!")
-            return jsonify({"message": message}), 201  # CREATED
+            logging.info("reserva inserido com sucesso!")
+            return jsonify({"message": message}), CREATED
         else:
-            logging.error(f"Erro ao fazer reserva: {message}")
-            return jsonify({"error": message}), 500  # INTERNAL_SERVER_ERROR
-
+            logging.error(f"error ao fazer reserva: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), 500
-
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 
 
@@ -395,6 +395,160 @@ def pagar_reserva():
         else:
             logging.error(f"Erro ao pagar reserva: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+@app.route('/cancelar_reserva', methods=['POST'])
+@jwt_required()
+def cancelar_reserva():
+    try:
+        data = request.get_json()
+        
+        user = get_jwt_identity()
+        
+        if user['tipo'] not in ['admin', 'rececionista']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idreserva"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para pagar a reserva
+        message = manageReservas.cancelar_reserva(
+            data['p_idreserva']
+        )
+
+        if "Reserva paga com sucesso!" in message:
+            logging.info("Reserva paga com sucesso!")
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"Erro ao pagar reserva: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+
+@app.route('/ver_reservasCliente', methods=['POST'])
+@jwt_required()
+def ver_reservas_cliente():
+    try:
+        data = request.get_json()
+        
+        user = get_jwt_identity()
+        
+        if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+        
+        if user['tipo'] == 'cliente' and data['p_idcliente'] != user['idcliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idcliente"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para ver as reservas do cliente
+        reservas = manageReservas.ver_reservasCliente(
+            data['p_idcliente']
+        )
+
+        if reservas:
+            logging.info("Reservas do cliente obtidas com sucesso!")
+            return jsonify({"reservas": reservas}), OK_CODE
+        else:
+            logging.error("Erro ao obter reservas do cliente.")
+            return jsonify({"error": "Erro ao obter reservas do cliente."}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+@app.route('/ver_todasReservas', methods=['POST'])
+@jwt_required()
+def ver_todas_reservas():
+    try:
+        user = get_jwt_identity()
+        
+        if user['tipo'] not in ['admin']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+
+        # Chamar a função para ver todas as reservas
+        reservas = manageReservas.ver_todasReservas()
+
+        if reservas:
+            logging.info("Todas as reservas obtidas com sucesso!")
+            return jsonify({"reservas": reservas}), OK_CODE
+        else:
+            logging.error("Erro ao obter todas as reservas.")
+            return jsonify({"error": "Erro ao obter todas as reservas."}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+    
+@app.route('/ver_pagamentos', methods=['POST'])
+@jwt_required()
+def ver_pagamentos():
+    try:
+        user = get_jwt_identity()
+        
+        if user['tipo'] not in ['admin']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+        
+        # Chamar a função para ver todos os pagamentos
+        pagamentos = manageTransacoes.ver_pagamentos()
+
+        if pagamentos:
+            logging.info("Todos os pagamentos obtidos com sucesso!")
+            return jsonify({"pagamentos": pagamentos}), OK_CODE
+        else:
+            logging.error("Erro ao obter todos os upagamentos.")
+            logging.error("Erro ao obter todos os pagamentos.")
+            # erro no postman
+            return jsonify({"error": "Erro ao obter todos os pagamentos."}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+@app.route('/ver_pagamentos_cliente', methods=['POST'])
+@jwt_required()
+def ver_pagamentos_cliente():
+    try:
+        data = request.get_json()
+        
+        user = get_jwt_identity()
+        
+        if user['tipo'] not in ['admin', 'cliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+        
+        if user['tipo'] == 'cliente' and data['p_idcliente'] != user['idcliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+
+        # Validar os parâmetros de entrada
+        if not all(k in data for k in ["p_idcliente"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Chamar a função para ver os pagamentos do cliente
+        pagamentos = manageTransacoes.verpagamentos_cliente(
+            data['p_idcliente']
+        )
+
+        if pagamentos:
+            logging.info("Pagamentos do cliente obtidos com sucesso!")
+            return jsonify({"pagamentos": pagamentos}), OK_CODE
+        else:
+            logging.error("Erro ao obter pagamentos do cliente.")
+            return jsonify({"error": "Erro ao obter pagamentos do cliente."}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
