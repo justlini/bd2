@@ -5,7 +5,7 @@ import logging
 from reservas import ManageReservas
 
 # Create the Blueprint
-bp_reservas = Blueprint('reservas', __name__)
+reservas_bp = Blueprint('reservas', __name__)
 
 manageReservas = ManageReservas()
 
