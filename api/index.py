@@ -129,33 +129,35 @@ def registar_quarto():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
     
     
-@app.route('reserva/<int:id_cliente>/<int:id_quarto>/inserir', methods=['POST'])
-def registar_reserva(id_cliente,id_quarto):
+@app.route('/reserva/<int:id_cliente>/<int:id_quarto>/inserir', methods=['POST'])
+def registar_reserva(id_cliente, id_quarto):
     try:
         data = request.get_json()
 
         # validar os parametros de entrada
         if not all(k in data for k in ["p_datacheckin", "p_datacheckout"]):
             logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+            return jsonify({"error": "Faltam parametros!"}), 400  # BAD_REQUEST
 
-        # chamar funcao para fazer reserva com o body formato para o postman
+        # chamar funcao para fazer reserva
         message = manageReservas.insert_reserva(
-            data[id_cliente],
-            data[id_quarto],
+            id_cliente,
+            id_quarto,
             data['p_datacheckin'],
             data['p_datacheckout']
         )
 
         if "Reserva feita feita com sucesso!" in message:
-            logging.info("reserva inserido com sucesso!")
-            return jsonify({"message": message}), CREATED
+            logging.info("reserva inserida com sucesso!")
+            return jsonify({"message": message}), 201  # CREATED
         else:
-            logging.error(f"error ao fazer reserva: {message}")
-            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+            logging.error(f"Erro ao fazer reserva: {message}")
+            return jsonify({"error": message}), 500  # INTERNAL_SERVER_ERROR
+
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+        return jsonify({"error": "Internal Server Error"}), 500
+
 
 
 
