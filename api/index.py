@@ -8,6 +8,7 @@ from quartos import ManageQuartos
 from reservas import ManageReservas
 from transacoes import ManageTransacoes
 from bp_reservas import reservas_bp
+from bp_transacoes import transacoes_bp
 import logging
 import bcrypt
 
@@ -47,6 +48,7 @@ def print_env_vars():
 
 
 app.register_blueprint(reservas_bp)
+app.register_blueprint(transacoes_bp)
 
 @app.route('/registar_emp', methods=['POST'])
 def registar_emp():
@@ -304,67 +306,7 @@ def ver_disponibilidade_quarto_route():
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
        
-@app.route('/ver_pagamentos', methods=['POST'])
-@jwt_required()
-def ver_pagamentos():
-    try:
-        user = get_jwt_identity()
-        
-        if user['tipo'] not in ['admin']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
-        
-        # Chamar a função para ver todos os pagamentos
-        pagamentos = manageTransacoes.ver_pagamentos()
 
-        if pagamentos:
-            logging.info("Todos os pagamentos obtidos com sucesso!")
-            return jsonify({"pagamentos": pagamentos}), OK_CODE
-        else:
-            logging.error("Erro ao obter todos os upagamentos.")
-            logging.error("Erro ao obter todos os pagamentos.")
-            # erro no postman
-            return jsonify({"error": "Erro ao obter todos os pagamentos."}), INTERNAL_SERVER_ERROR
-    except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
-    
-@app.route('/ver_pagamentos_cliente', methods=['POST'])
-@jwt_required()
-def ver_pagamentos_cliente():
-    try:
-        data = request.get_json()
-        
-        user = get_jwt_identity()
-        
-        if user['tipo'] not in ['admin', 'cliente']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
-        
-        if user['tipo'] == 'cliente' and data['p_idcliente'] != user['idcliente']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
-
-        # Validar os parâmetros de entrada
-        if not all(k in data for k in ["p_idcliente"]):
-            logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
-
-        # Chamar a função para ver os pagamentos do cliente
-        pagamentos = manageTransacoes.verpagamentos_cliente(
-            data['p_idcliente']
-        )
-
-        if pagamentos:
-            logging.info("Pagamentos do cliente obtidos com sucesso!")
-            return jsonify({"pagamentos": pagamentos}), OK_CODE
-        else:
-            logging.error("Erro ao obter pagamentos do cliente.")
-            return jsonify({"error": "Erro ao obter pagamentos do cliente."}), INTERNAL_SERVER_ERROR
-    except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
-    
 
 @app.route('/inserir_quarto', methods=['POST'])
 def registar_quarto():
