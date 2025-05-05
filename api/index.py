@@ -460,6 +460,44 @@ def ver_pagamentos_cliente():
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+
+@app.route('/inserir_quarto', methods=['POST'])
+def registar_quarto():
+    try:
+        data = request.get_json()
+
+        # Validate input parameters
+        if not all(k in data for k in ["p_numeroquarto", "p_precoquarto", "p_tipoquarto"]):
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+
+        # Check if the room already exists
+        if manageQuartos.quarto_exists(data["p_numeroquarto"]):
+            logging.error("Quarto com esse numero já existe!")
+            return jsonify({"error": "Quarto com esse numero já existe!"}), CONFLICT
+
+        # Validate room type
+        if data["p_tipoquarto"] not in ["casal", "solteiro"]:
+            logging.error("Tipo de quarto invalido!")
+            return jsonify({"error": "Tipo de quarto invalido!"}), BAD_REQUEST
+
+        # Call the insert_quarto function
+        message = manageQuartos.insert_quarto(
+            data['p_numeroquarto'],
+            data['p_precoquarto'],
+            data['p_tipoquarto']
+        )
+
+        if "Quarto inserido com sucesso!" in message:
+            logging.info("Quarto inserido com sucesso!")
+            return jsonify({"message": message}), CREATED
+        else:
+            logging.error(f"Erro ao inserir quarto: {message}")
+            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 # Execução do aplicativo Flask
 if __name__ == '__main__':
