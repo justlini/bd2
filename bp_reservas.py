@@ -10,7 +10,7 @@ reservas_bp = Blueprint('reservas', __name__)
 manageReservas = ManageReservas()
 
 # Define the route using the Blueprint
-@bp_reservas.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
+@reservas_bp.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
