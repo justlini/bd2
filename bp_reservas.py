@@ -1,14 +1,15 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from api.conn import BaseDeDados
 import logging
 from api.conn import BaseDeDados
 from reservas import ManageReservas
 
 reservas_bp = Blueprint('reservas', __name__)
 
-
 manageReservas = ManageReservas()
 
+bd = BaseDeDados()
 
 @app.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
 @jwt_required()
