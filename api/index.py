@@ -367,9 +367,9 @@ def ver_disponibilidade_quarto_route():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
     
     
-@app.route('/pagar_reserva', methods=['POST'])
+@app.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
 @jwt_required()
-def pagar_reserva():
+def pagar_reserva(id_reserva):
     try:
         data = request.get_json()
         
@@ -385,9 +385,7 @@ def pagar_reserva():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
 
         # Chamar a função para pagar a reserva
-        message = manageReservas.pagar_reserva(
-            data['p_idreserva']
-        )
+        message = manageReservas.pagar_reserva(id_reserva)
 
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
