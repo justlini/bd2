@@ -7,6 +7,7 @@ from utilizadores import Utilizadores
 from quartos import ManageQuartos
 from reservas import ManageReservas
 from transacoes import ManageTransacoes
+from bp_reservas import reservas_bp 
 import logging
 import bcrypt
 
@@ -43,6 +44,9 @@ def print_env_vars():
         "db_password": os.getenv("db_password")
     }
     return jsonify(env_vars), OK_CODE
+
+
+app.register_blueprint(reservas_bp)
 
 @app.route('/registar_emp', methods=['POST'])
 def registar_emp():
@@ -130,37 +134,6 @@ def registar_quarto():
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
     
-    
-@app.route('/inserir_reserva', methods=['POST'])
-def registar_reserva():
-    try:
-        data = request.get_json()
-
-        # validar os parametros de entrada
-        if not all(k in data for k in ["p_idcliente", "p_idquarto", "p_datacheckin", "p_datacheckout"]):
-            logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
-
-        # chamar funcao para fazer reserva com o body formato para o postman
-        message = manageReservas.insert_reserva(
-            data['p_idcliente'],
-            data['p_idquarto'],
-            data['p_datacheckin'],
-            data['p_datacheckout']
-        )
-
-        if "Reserva feita feita com sucesso!" in message:
-            logging.info("reserva inserido com sucesso!")
-            return jsonify({"message": message}), CREATED
-        else:
-            logging.error(f"error ao fazer reserva: {message}")
-            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
-    except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
-
-
-
 # Caminho para registrar um novo utilziador
 @app.route('/registar_utilizador', methods=['POST'])
 def register():
@@ -367,37 +340,7 @@ def ver_disponibilidade_quarto_route():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
     
     
-@app.route('/pagar_reserva', methods=['POST'])
-@jwt_required()
-def pagar_reserva():
-    try:
-        data = request.get_json()
-        
-        user = get_jwt_identity()
-        
-        if user['tipo'] not in ['admin', 'rececionista']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
 
-        # Validar os parâmetros de entrada
-        if not all(k in data for k in ["p_idreserva"]):
-            logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
-
-        # Chamar a função para pagar a reserva
-        message = manageReservas.pagar_reserva(
-            data['p_idreserva']
-        )
-
-        if "Reserva paga com sucesso!" in message:
-            logging.info("Reserva paga com sucesso!")
-            return jsonify({"message": message}), CREATED
-        else:
-            logging.error(f"Erro ao pagar reserva: {message}")
-            return jsonify({"error": message}), INTERNAL_SERVER_ERROR
-    except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
     
 @app.route('/cancelar_reserva', methods=['POST'])
 @jwt_required()
