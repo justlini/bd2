@@ -5,6 +5,20 @@ import logging
 from api.conn import BaseDeDados
 from reservas import ManageReservas
 
+app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = 'olamundo' #os.getenv('JWT_SECRET')
+jwt = JWTManager(app)
+utilizadores = Utilizadores()
+manageQuartos = ManageQuartos()
+manageReservas = ManageReservas()
+# Códigos HTTP
+OK_CODE = 200
+BAD_REQUEST = 400
+CONFLICT = 409
+INTERNAL_SERVER_ERROR = 500
+CREATED = 201
+
+bd = BaseDeDados()
 reservas_bp = Blueprint('reservas', __name__)
 
 manageReservas = ManageReservas()
