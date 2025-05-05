@@ -17,6 +17,7 @@ utilizadores_bp = Blueprint('utilizadores', __name__)
 utilizadores = Utilizadores()
 
 
+bd = BaseDeDados()
 
 @utilizadores_bp.route('/registar_emp', methods=['POST'])
 def registar_emp():
