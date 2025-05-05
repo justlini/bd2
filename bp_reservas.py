@@ -4,6 +4,14 @@ from api.conn import BaseDeDados
 import logging
 from reservas import ManageReservas
 
+
+OK_CODE = 200
+BAD_REQUEST = 400
+CONFLICT = 409
+INTERNAL_SERVER_ERROR = 500
+CREATED = 201
+
+
 # Create the Blueprint
 reservas_bp = Blueprint('reservas', __name__)
 
