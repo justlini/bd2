@@ -10,7 +10,6 @@ class ManageAuditoria:
         if conn is None:
             return "Erro de conexÃ£o com a base de dados."
         try:
-            p_data='2025-05-06'
             cur = conn.cursor()
             cur.execute("CALL inserir_log(%s, %s, %s,%s);",
                         (p_utilizador_bd, p_utilizador_app, p_data, p_acao))
