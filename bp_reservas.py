@@ -33,8 +33,9 @@ def pagar_reserva(id_reserva):
             return jsonify({"error": "Unauthorized"}), 400 
         message = manageReservas.pagar_reserva(id_reserva)
 
+        log_message = f"Pagar reserva: {id_reserva}"
 
-        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,"Pagar reserva:"+id_reserva)
+        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
 
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
