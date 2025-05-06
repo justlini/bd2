@@ -13,7 +13,7 @@ class ManageAuditoria:
             p_data=datetime.datetime.now()
             cur = conn.cursor()
             cur.execute("CALL inserir_log(%s, %s, %s,%s);",
-                        ("ola", "adeus", p_data, "ooooooooooo"))
+                        (p_utilizador_bd, p_utilizador_app, p_data, p_acao))
             conn.commit()
             cur.close()
             conn.close()
