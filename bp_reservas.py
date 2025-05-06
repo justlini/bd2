@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.conn import BaseDeDados
 import logging
+from datetime import datetime
 from reservas import ManageReservas
 from auditoria import ManageAuditoria
 
@@ -26,6 +27,7 @@ def pagar_reserva(id_reserva):
     try:
         p_utilizador_bd = "teste"
         p_utilizador_app = "teste"
+        p_data=datetime.datetime.now()
         user = get_jwt_identity()
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
@@ -33,7 +35,7 @@ def pagar_reserva(id_reserva):
         message = manageReservas.pagar_reserva(id_reserva)
 
 
-        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,"2025-01-01","Pagar reserva")
+        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_data,"Pagar reserva")
 
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
