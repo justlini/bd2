@@ -105,7 +105,7 @@ class ManageReservas:
             result = cur.fetchone()
             cur.close()
             conn.close()
-            return result[0] if result else False
+            return result[1] if result else False
         except Exception as e:
             return False
     
