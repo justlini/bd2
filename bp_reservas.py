@@ -24,10 +24,10 @@ p_utilizador_app = "teste"
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
-        p_utilizador_bd = "teste"
-        p_utilizador_app = "teste"
-        p_dataLog='2025-05-06'
         user = get_jwt_identity()
+        p_utilizador_bd = "admin"
+        p_utilizador_app = user['nome']
+        p_dataLog='2025-05-06'
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
             return jsonify({"error": "Unauthorized"}), 400 
