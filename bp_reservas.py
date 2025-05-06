@@ -24,6 +24,8 @@ p_utilizador_app = "teste"
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
+        p_utilizador_bd = "teste"
+        p_utilizador_app = "teste"
         user = get_jwt_identity()
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
