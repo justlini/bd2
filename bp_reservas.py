@@ -171,7 +171,7 @@ def verSeDisponivel():
             #erro no postman
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
         
-        if manageReservas.verDisponibilidadeQuarto(data["idemp"], data["idcliente"]):
+        if manageReservas.verDisponibilidadeQuarto(data["p_idquarto"], data["data_pretendida"]):
             logging.error("Quarto ocupado")
 
             return jsonify({"error": "Quarto n disponivel"}), CONFLICT
