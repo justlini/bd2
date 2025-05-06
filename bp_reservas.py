@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.conn import BaseDeDados
 import logging
-from datetime import datetime
 from reservas import ManageReservas
 from auditoria import ManageAuditoria
 
@@ -27,7 +26,7 @@ def pagar_reserva(id_reserva):
     try:
         p_utilizador_bd = "teste"
         p_utilizador_app = "teste"
-        p_data=datetime.datetime.now()
+        p_data='2025-05-06'
         user = get_jwt_identity()
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
