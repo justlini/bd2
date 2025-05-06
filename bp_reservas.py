@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.conn import BaseDeDados
 import logging
 from reservas import ManageReservas
-
+from auditoria import ManageAuditoria
 
 OK_CODE = 200
 BAD_REQUEST = 400
@@ -16,7 +16,9 @@ CREATED = 201
 reservas_bp = Blueprint('reservas', __name__)
 
 manageReservas = ManageReservas()
-
+manageAuditoria = ManageAuditoria()
+p_utilizador_bd = "teste"
+p_utilizador_app = "teste"
 
 @reservas_bp.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
 @jwt_required()
@@ -27,6 +29,10 @@ def pagar_reserva(id_reserva):
             logging.error("Unauthorized access attempt.")
             return jsonify({"error": "Unauthorized"}), 400 
         message = manageReservas.pagar_reserva(id_reserva)
+
+
+        manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,"Pagar reserva")
+
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
             return jsonify({"message": message}), 201  
