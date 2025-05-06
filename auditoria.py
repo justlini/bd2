@@ -8,7 +8,7 @@ class ManageAuditoria:
     def insert_Log(self, p_utilizador_bd, p_utilizador_app,p_data, p_acao):
         conn = self.bd.get_conn()
         if conn is None:
-            return "Erro de conexÃ£o com a base de dados."
+            return "Erro de conexÃo com a base de dados."
         try:
             cur = conn.cursor()
             cur.execute("CALL inserir_log(%s, %s, %s,%s);",
@@ -16,6 +16,6 @@ class ManageAuditoria:
             conn.commit()
             cur.close()
             conn.close()
-            return "Log inserido com sucesso.!"
+            return "Reserva paga e log inserido"
         except Exception as e:
             return str(e)
