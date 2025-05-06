@@ -175,6 +175,9 @@ def verSeDisponivel():
             logging.error("Quarto ocupado")
 
             return jsonify({"error": "Quarto n disponivel"}), CONFLICT
+        else:
+            logging.info("Quarto Disponivel")
+            return jsonify({"Quarto disponivel"}), 201  
         
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
