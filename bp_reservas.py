@@ -180,5 +180,4 @@ def verSeDisponivel():
             return jsonify({"Quarto disponivel"}), 201  
         
     except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+        return jsonify({"Erro"})
