@@ -177,7 +177,7 @@ def verSeDisponivel():
             return jsonify({"error": "Quarto n disponivel"}), CONFLICT
         else:
             logging.info("Quarto Disponivel")
-            return jsonify({"Quarto disponivel"}), 201  
+            return jsonify({"Quarto disponivel"}), CONFLICT
         
     except Exception as e:
         return jsonify({"Erro"})
