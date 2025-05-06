@@ -26,7 +26,7 @@ def pagar_reserva(id_reserva):
     try:
         p_utilizador_bd = "teste"
         p_utilizador_app = "teste"
-        p_data='2025-05-06'
+        p_dataLog='2025-05-06'
         user = get_jwt_identity()
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
@@ -34,7 +34,7 @@ def pagar_reserva(id_reserva):
         message = manageReservas.pagar_reserva(id_reserva)
 
 
-        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_data,"Pagar reserva")
+        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,"Pagar reserva")
 
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
