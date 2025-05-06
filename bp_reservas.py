@@ -33,7 +33,7 @@ def pagar_reserva(id_reserva):
         message = manageReservas.pagar_reserva(id_reserva)
 
 
-        manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,"2025-01-01","Pagar reserva")
+        message =manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,"2025-01-01","Pagar reserva")
 
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
