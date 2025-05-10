@@ -143,7 +143,7 @@ def login():
         
             role = str(user[4]) if user[4] else "cliente"
             role_user = os.getenv(f"{role}_db_user")
-            role_password = os.getenv(f"{role}_db_password")
+            role_password = os.getenv("db_password")
             conn_nova = BaseDeDados(role_user, role_password)
             if conn_nova.get_conn() is None:
                 logging.error("Database connection failed.")
