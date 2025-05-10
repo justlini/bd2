@@ -10,8 +10,8 @@ class BaseDeDados:
         #dados server
         self.host = os.getenv("db_host")
         self.database = os.getenv("db_database")
-        self.user = user if user   # tirar else
-        self.password = password if password else os.getenv("db_password")  # tirar else
+        self.user = user   # tirar else
+        self.password = password  # tirar else
         print(f"Conectando ao banco de dados {self.database} no host {self.host} com o usuário {self.user}.")
 
     def get_conn(self):
