@@ -19,6 +19,10 @@ class BaseDeDados:
         elif user_type == "rececionista":
             self.user = os.getenv("rececionista_db_user")
             self.password = os.getenv("rececionista_db_password")
+        else:
+            # default se nao conseguir nada tirar depois
+            self.user = user if user else os.getenv("db_user")
+            self.password = password if password else os.getenv("db_password")
 
         print(f"Conectando ao banco de dados {self.database} no host {self.host} com o usuário {self.user}.")
 
