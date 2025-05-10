@@ -12,7 +12,7 @@ class BaseDeDados:
             self.password = os.getenv("db_password")
         elif user_type == "cliente":
             self.user = os.getenv("cliente_db_user")
-            self.password = os.getenv("db_password")
+            self.password = "a2022117585"
         elif user_type == "rececionista":
             self.user = os.getenv("rececionista_db_user")
             self.password = os.getenv("db_password")
