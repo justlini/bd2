@@ -154,7 +154,7 @@ def login():
                 "idcliente": str(user[0]),
                 "nome": str(user[1]),
                 "email": str(user[2]),
-                "tipo": role # Se não for admin, define como cliente
+                "tipo": role_user # Se não for admin, define como cliente
             }
             token = create_access_token(identity=user_data)
             logging.info(f"User {user[2]} logged in successfully.")
