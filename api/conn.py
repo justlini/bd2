@@ -12,13 +12,13 @@ class BaseDeDados:
         # if para login
         if user_type == "admin":
             self.user = os.getenv("admin_db_user")
-            self.password = os.getenv("admin_db_password")
+            self.password = os.getenv("db_password")
         elif user_type == "cliente":
             self.user = os.getenv("cliente_db_user")
-            self.password = os.getenv("cliente_db_password")
+            self.password = os.getenv("db_password")
         elif user_type == "rececionista":
             self.user = os.getenv("rececionista_db_user")
-            self.password = os.getenv("rececionista_db_password")
+            self.password = os.getenv("db_password")
         else:
             # default se nao conseguir nada tirar depois
             self.user = user if user else os.getenv("db_user")
