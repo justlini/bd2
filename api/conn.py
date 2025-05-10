@@ -5,7 +5,7 @@ import psycopg2
 import os
 
 class BaseDeDados:
-    def __init__(self, user=None, password=None, user_type=None):
+    def __init__(self,user_type=None):
         self.host = os.getenv("db_host")
         self.database = os.getenv("db_database")
 
