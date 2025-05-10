@@ -5,6 +5,7 @@ from api.conn import BaseDeDados
 import logging
 from utilizadores import Utilizadores
 import bcrypt
+import os
 
 OK_CODE = 200
 BAD_REQUEST = 400
@@ -139,12 +140,21 @@ def login():
         conn.close()
 
         if user and bcrypt.checkpw(data['senha'].encode('utf-8'), user[3].encode('utf-8')):
+        
+            role = str(user[4]) if user[4] else "cliente"
+            role_user = os.getenv(f"{role}_db_user")
+            role_password = os.getenv(f"{role}_db_password")
+            conn_nova = BaseDeDados(role_user, role_password)
+            if conn_nova.get_conn() is None:
+                logging.error("Database connection failed.")
+                return jsonify({"error": "Database connection failed"}), INTERNAL_SERVER_ERROR
+
             # Login bem-sucedido
             user_data = {
                 "idcliente": str(user[0]),
                 "nome": str(user[1]),
                 "email": str(user[2]),
-                "tipo": str(user[4]) if user[4] else "cliente"  # Se não for admin, define como cliente
+                "tipo": role # Se não for admin, define como cliente
             }
             token = create_access_token(identity=user_data)
             logging.info(f"User {user[2]} logged in successfully.")
