@@ -10,7 +10,7 @@ class BaseDeDados:
         #dados server
         self.host = os.getenv("db_host")
         self.database = os.getenv("db_database")
-        self.user = user if user else os.getenv("admin_db_user")  # Use provided user or default
+        self.user = user  # Use provided user or default
         self.password = password if password else os.getenv("db_password")  # Use provided password or default
         print(f"Conectando ao banco de dados {self.database} no host {self.host} com o usuário {self.user}.")
 
