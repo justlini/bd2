@@ -157,7 +157,7 @@ def login():
                 "email": str(user[2]),
                 "tipo": role,  # Store the role
                 "db_user": conn_nova.user,
-                "exp": datetime.utcnow() + timedelta(minutes=60)
+                "exp": datetime.utcnow() + timedelta(minutes=1)
             }
             token = create_access_token(identity=user_data)
         
