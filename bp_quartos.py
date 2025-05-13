@@ -61,6 +61,7 @@ def mudarprecoquarto():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 @quartos_bp.route('/mudarTipoQuarto', methods=['POST'])
+@jwt_required()
 def mudartipoquarto():
     try:
         user = get_jwt_identity()
@@ -68,7 +69,11 @@ def mudartipoquarto():
         p_utilizador_app = user['nome']
         p_utilizador_bd = user['db_user']
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+        
+        if user['tipo'] != 'admin':
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+        
         # Validar os parâmetros de entrada
         if not all(k in data for k in ["p_idquarto", "p_tipoquarto"]):
             logging.error("Faltam parametros!")
@@ -93,6 +98,7 @@ def mudartipoquarto():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 @quartos_bp.route('/get_ImagensQuarto', methods=['POST'])
+@jwt_required()
 def get_imagens_quarto():
     try:
         user = get_jwt_identity()
@@ -124,6 +130,7 @@ def get_imagens_quarto():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 @quartos_bp.route('/upload_imagem_quarto', methods=['POST'])
+@jwt_required()
 def upload_imagem_quarto_route():
     try:
         user = get_jwt_identity()
@@ -131,7 +138,11 @@ def upload_imagem_quarto_route():
         p_utilizador_app = user['nome']
         p_utilizador_bd = user['db_user']
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
+        
+        if user['tipo'] not in ['admin', 'rececionista']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+        
         # Validar os parâmetros de entrada
         if not all(k in data for k in ["p_idquarto", "p_imagem"]):
             logging.error("Faltam parametros!")
@@ -157,6 +168,7 @@ def upload_imagem_quarto_route():
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
 @quartos_bp.route('/ver_disponibilidade_quarto', methods=['GET'])
+@jwt_required()
 def ver_disponibilidade_quarto_route():
     user = get_jwt_identity()
     p_utilizador_app = user['nome']
@@ -177,6 +189,7 @@ def ver_disponibilidade_quarto_route():
 
 
 @quartos_bp.route('/inserir_quarto', methods=['POST'])
+@jwt_required()
 def registar_quarto():
     try:
         user = get_jwt_identity()
