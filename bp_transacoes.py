@@ -53,8 +53,10 @@ def ver_pagamentos():
 def ver_pagamentos_cliente():
     try:
         data = request.get_json()
-        
         user = get_jwt_identity()
+        p_utilizador_app = user['nome']
+        p_utilizador_bd = user['db_user']
+        p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'cliente']:
             logging.error("Unauthorized access attempt.")
@@ -76,6 +78,8 @@ def ver_pagamentos_cliente():
 
         if pagamentos:
             logging.info("Pagamentos do cliente obtidos com sucesso!")
+            log_message = f"Ver pagamentos cliente ID: {data['p_idcliente']}"
+            manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
             return jsonify({"pagamentos": pagamentos}), OK_CODE
         else:
             logging.error("Erro ao obter pagamentos do cliente.")
