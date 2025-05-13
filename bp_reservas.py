@@ -32,8 +32,7 @@ def pagar_reserva(id_reserva):
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
             return jsonify({"error": "Unauthorized"}), 400 
-        message = manageReservas.pagar_reserva(id_reserva)
-        manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,"Pagar reserva")
+        manageReservas.pagar_reserva(id_reserva)
 
         log_message = f"Pagar reserva: {id_reserva}"
 
@@ -52,6 +51,10 @@ def pagar_reserva(id_reserva):
 @reservas_bp.route('/reserva/<int:id_cliente>/<int:id_quarto>/inserir', methods=['POST'])
 def registar_reserva(id_cliente, id_quarto):
     try:
+        user = get_jwt_identity()
+        p_utilizador_app = user['nome']
+        p_utilizador_bd = user['db_user']
+        p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         data = request.get_json()
 
         # validar os parametros de entrada
@@ -66,6 +69,8 @@ def registar_reserva(id_cliente, id_quarto):
             data['p_datacheckin'],
             data['p_datacheckout']
         )
+        log_message = f"Registar reserva: {id_quarto}"
+        manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
 
         if "Reserva feita feita com sucesso!" in message:
             logging.info("reserva inserida com sucesso!")
@@ -83,8 +88,11 @@ def registar_reserva(id_cliente, id_quarto):
 def cancelar_reserva():
     try:
         data = request.get_json()
-        
         user = get_jwt_identity()
+        p_utilizador_app = user['nome']
+        p_utilizador_bd = user['db_user']
+        p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
@@ -99,6 +107,9 @@ def cancelar_reserva():
         message = manageReservas.cancelar_reserva(
             data['p_idreserva']
         )
+
+        log_message = f"Cancelar reserva: {data['p_idreserva']}"
+        manageAuditoria.insert_Log(p_utilizador_bd, p_utilizador_app, p_dataLog, log_message)
 
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
@@ -115,8 +126,10 @@ def cancelar_reserva():
 def ver_reservas_cliente():
     try:
         data = request.get_json()
-        
         user = get_jwt_identity()
+        p_utilizador_app = user['nome']
+        p_utilizador_bd = user['db_user']
+        p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
             logging.error("Unauthorized access attempt.")
@@ -136,6 +149,9 @@ def ver_reservas_cliente():
         reservas = manageReservas.ver_reservasCliente(
             data['p_idcliente']
         )
+
+        log_message = f"Ver reserva cliente ID: {data['p_idcliente']}"
+        manageAuditoria.insert_Log(p_utilizador_bd, p_utilizador_app, p_dataLog, log_message)
 
         if reservas:
             logging.info("Reservas do cliente obtidas com sucesso!")
