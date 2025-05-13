@@ -17,7 +17,7 @@ transacoes_bp = Blueprint('transacoes', __name__)
 manageTransacoes = ManageTransacoes()
 manageAuditoria = ManageAuditoria()
 
-@transacoes_bp.route('/ver_pagamentos', methods=['POST'])
+@transacoes_bp.route('/ver_pagamentos', methods=['GET'])
 @jwt_required()
 def ver_pagamentos():
     try:
