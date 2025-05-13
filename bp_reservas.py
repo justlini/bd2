@@ -189,9 +189,14 @@ def ver_todas_reservas():
     
 
 @reservas_bp.route('/ver_seQuartoDisponivel', methods=['POST'])
+@jwt_required()
 def verSeDisponivel():
     try:
         data = request.get_json()
+        user = get_jwt_identity()
+        p_utilizador_app = user['nome']
+        p_utilizador_bd = user['db_user']
+        p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
                 #verificar se todos os parametros existem
         if not all(k in data for k in ["p_idquarto", "data_pretendida"]):
@@ -199,6 +204,9 @@ def verSeDisponivel():
 
             #erro no postman
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+        
+        log_message = f"Ver reserva Quarto disponivel: {data['p_idquarto']}"
+        manageAuditoria.insert_Log(p_utilizador_bd, p_utilizador_app, p_dataLog, log_message)
         
         if manageReservas.verDisponibilidadeQuarto(data["p_idquarto"], data["data_pretendida"]):
             logging.info("Quarto ocupado")
