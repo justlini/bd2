@@ -23,7 +23,7 @@ manageAuditoria = ManageAuditoria()
 bd = BaseDeDados()
 
 @utilizadores_bp.route('/registar_emp', methods=['POST'])
-@jwt_required
+@jwt_required()
 def registar_emp():
     try:
         user = get_jwt_identity()
