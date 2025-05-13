@@ -87,7 +87,7 @@ def mudartipoquarto():
 
         if "Tipo do quarto alterado com sucesso!" in message:
             logging.info("Tipo do quarto alterado com sucesso!")
-            log_message = f"Modou o tipo do quarto: {data['p_idquarto']} para {data['p_tipoquarto']}"
+            log_message = f"Mudou o tipo do quarto {data['p_idquarto']} para {data['p_tipoquarto']}"
             manageAuditoria.insert_Log(p_utilizador_bd, p_utilizador_app, p_dataLog, log_message)
             return jsonify({"message": message}), CREATED
         else:
