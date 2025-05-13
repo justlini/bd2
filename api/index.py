@@ -18,7 +18,7 @@ import bcrypt
 # Configuração do Flask
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=1)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
 jwt = JWTManager(app)
 utilizadores = Utilizadores()
 manageQuartos = ManageQuartos()
