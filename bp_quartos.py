@@ -202,10 +202,17 @@ def registar_quarto():
         p_utilizador_bd = user['db_user']
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        
+
         # Validate input parameters
         if not all(k in data for k in ["p_numeroquarto", "p_precoquarto", "p_tipoquarto"]):
             logging.error("Faltam parametros!")
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+        
+        
+        if user['tipo'] not in ['admin']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
 
         # Check if the room already exists
         if manageQuartos.quarto_exists(data["p_numeroquarto"]):
