@@ -68,9 +68,6 @@ def registar_emp():
             data['tipoemp'],
             data['idcliente']
         )
-        log_message = f"Conta empregado criada: {id}"
-
-        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
         
         #empregado existe
         if "Empregado inserido com sucesso!" in message:
