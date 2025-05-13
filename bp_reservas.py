@@ -18,8 +18,6 @@ reservas_bp = Blueprint('reservas', __name__)
 
 manageReservas = ManageReservas()
 manageAuditoria = ManageAuditoria()
-p_utilizador_bd = "teste"
-p_utilizador_app = "teste"
 
 @reservas_bp.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
 @jwt_required()
@@ -29,7 +27,7 @@ def pagar_reserva(id_reserva):
         user = get_jwt_identity()
         p_utilizador_app = user['nome']
         p_utilizador_bd = user['db_user']
-        p_dataLog= datetime.now()
+        p_dataLog= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
