@@ -16,5 +16,6 @@ class ManageAuditoria:
             conn.commit()
             cur.close()
             conn.close()
+            return "Log inserido"
         except Exception as e:
             return str(e)
