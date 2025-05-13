@@ -91,6 +91,7 @@ def registar_emp():
 def register():
     try:
         data = request.get_json()
+        p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         logging.debug(f"Received data: {data}")
         
@@ -119,6 +120,8 @@ def register():
 
         if "Utilizador inserido com sucesso!" in message:
             logging.info("Utilizador inserido com sucesso!")
+            log_message = f"Conta criada: {data['email']}"
+            message = manageAuditoria.insert_Log(data['nome'],data['email'],p_dataLog,log_message)
             return jsonify({"message": message}), CREATED
         else:
             logging.error(f"Error inserting user: {message}")
