@@ -21,7 +21,7 @@ class BaseDeDados:
             self.user = user if user else os.getenv("db_user")
             self.password = password if password else os.getenv("db_password")
 
-        print(f"Conectando ao banco de dados {self.database} no host {self.host} com o usuário {self.user}.")
+        print(f"Ligacao feita na {self.database} no host {self.host} com o user {self.user}.")
 
     def get_conn(self):
         if not all([self.host, self.database, self.user, self.password]):
