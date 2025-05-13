@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, creat
 from api.conn import BaseDeDados
 import logging
 from utilizadores import Utilizadores
+from datetime import datetime, timedelta
 import bcrypt
 import os
 
@@ -155,9 +156,12 @@ def login():
                 "nome": str(user[1]),
                 "email": str(user[2]),
                 "tipo": role,  # Store the role
-                "db_user": conn_nova.user
+                "db_user": conn_nova.user,
+                "exp": datetime.utcnow() + timedelta(minutes=60)
             }
             token = create_access_token(identity=user_data)
+        
+
             logging.info(f"User {user[2]} logged in successfully as {role}.")
             return jsonify({"message": "Login successful", "access_token": token, "user": user_data}), OK_CODE
         else:
