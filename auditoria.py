@@ -16,6 +16,6 @@ class ManageAuditoria:
             conn.commit()
             cur.close()
             conn.close()
-            return "Reserva paga e log inserido"
+            return "Log inserido"
         except Exception as e:
             return str(e)

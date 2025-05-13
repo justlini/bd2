@@ -6,6 +6,8 @@ import logging
 from utilizadores import Utilizadores
 import bcrypt
 import os
+from auditoria import ManageAuditoria
+from datetime import datetime
 
 OK_CODE = 200
 BAD_REQUEST = 400
@@ -16,14 +18,21 @@ CREATED = 201
 utilizadores_bp = Blueprint('utilizadores', __name__)
 
 utilizadores = Utilizadores()
-
+manageAuditoria = ManageAuditoria()
 
 bd = BaseDeDados()
 
 @utilizadores_bp.route('/registar_emp', methods=['POST'])
+@jwt_required
 def registar_emp():
     try:
+        user = get_jwt_identity()
         data = request.get_json()
+        p_dataLog= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        p_utilizador_app = user['nome']
+        p_utilizador_bd = user['db_user']
+        p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         #debug de erros descomentar quando estiver a dar treta
         #logging.debug(f"Received data: {data}")
 
@@ -33,6 +42,10 @@ def registar_emp():
 
             #erro no postman
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+        
+        if user['tipo'] not in ['admin']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
 
         #verificar se o empregado já exsite
         if utilizadores.emp_exists(data["idemp"], data["idcliente"]):
@@ -55,6 +68,9 @@ def registar_emp():
             data['tipoemp'],
             data['idcliente']
         )
+        log_message = f"Conta empregado criada: {data['idemp']}"
+
+        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
         
         #empregado existe
         if "Empregado inserido com sucesso!" in message:
@@ -158,6 +174,8 @@ def login():
                 "db_user": conn_nova.user
             }
             token = create_access_token(identity=user_data)
+        
+
             logging.info(f"User {user[2]} logged in successfully as {role}.")
             return jsonify({"message": "Login successful", "access_token": token, "user": user_data}), OK_CODE
         else:

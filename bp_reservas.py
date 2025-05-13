@@ -49,6 +49,7 @@ def pagar_reserva(id_reserva):
         return jsonify({"error": "Internal Server Error"}), 500
     
 @reservas_bp.route('/reserva/<int:id_cliente>/<int:id_quarto>/inserir', methods=['POST'])
+@jwt_required()
 def registar_reserva(id_cliente, id_quarto):
     try:
         user = get_jwt_identity()

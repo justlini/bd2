@@ -11,12 +11,14 @@ from bp_reservas import reservas_bp
 from bp_transacoes import transacoes_bp
 from bp_utilizadores import utilizadores_bp
 from bp_quartos import quartos_bp
+from datetime import timedelta
 import logging
 import bcrypt
 
 # Configuração do Flask
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=60)
 jwt = JWTManager(app)
 utilizadores = Utilizadores()
 manageQuartos = ManageQuartos()
