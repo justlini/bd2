@@ -33,7 +33,7 @@ class Utilizadores:
             conn.commit()
             cur.close()
             conn.close()
-            return "Empregado inserirdo com sucesso!"
+            return "Empregado inserido com sucesso!"
         except Exception as e:
             return str(e)
         
