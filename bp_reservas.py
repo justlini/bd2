@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from datetime import datetime
 from api.conn import BaseDeDados
 import logging
 from reservas import ManageReservas
@@ -17,17 +18,17 @@ reservas_bp = Blueprint('reservas', __name__)
 
 manageReservas = ManageReservas()
 manageAuditoria = ManageAuditoria()
-p_utilizador_bd = "teste"
-p_utilizador_app = "teste"
 
 @reservas_bp.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
+        # Obter os dados do utilizador autenticado
         user = get_jwt_identity()
-        p_utilizador_bd = "admin"
         p_utilizador_app = user['nome']
-        p_dataLog='2025-05-06'
+        p_utilizador_bd = user['db_user']
+        p_dataLog= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
             return jsonify({"error": "Unauthorized"}), 400 
