@@ -40,7 +40,7 @@ def pagar_reserva(id_reserva):
 
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
-            return jsonify({"message": message}), 201  
+            return jsonify({"message": message}), 201
         else:
             logging.error(f"Erro ao pagar reserva: {message}")
             return jsonify({"error": message}), 500 
