@@ -93,6 +93,20 @@ class ManageReservas:
             return pagamentos
         except Exception as e:
             return str(e)
+    
+    def verDisponibilidadeQuarto(self,p_idquarto,data_pretendida):
+        conn = self.bd.get_conn()
+        if conn is None:
+            return "Erro de conexão com a base de dados."
         
+        try:
+            cur = conn.cursor()
+            cur.execute("Select quarto_ocupado(%s, %s);", (p_idquarto, data_pretendida))
+            result = cur.fetchone()
+            cur.close()
+            conn.close()
+            return result[0] if result else False
+        except Exception as e:
+            return False
     
     

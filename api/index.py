@@ -34,8 +34,11 @@ bd = BaseDeDados()
 # caminho para ir buscar as variaveis de ambiente
 
 app.register_blueprint(reservas_bp)
+
 app.register_blueprint(transacoes_bp)
+
 app.register_blueprint(utilizadores_bp)
+
 app.register_blueprint(quartos_bp)
 
 # Rota para login de usuário

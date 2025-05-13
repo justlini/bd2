@@ -20,30 +20,33 @@ manageAuditoria = ManageAuditoria()
 p_utilizador_bd = "teste"
 p_utilizador_app = "teste"
 
-# Define the route using the Blueprint
 @reservas_bp.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
         user = get_jwt_identity()
-        
+        p_utilizador_bd = "admin"
+        p_utilizador_app = user['nome']
+        p_dataLog='2025-05-06'
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), 400  # BAD_REQUEST
-
-        # Call the function to pay for the reservation
+            return jsonify({"error": "Unauthorized"}), 400 
         message = manageReservas.pagar_reserva(id_reserva)
         manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,"Pagar reserva")
 
+        log_message = f"Pagar reserva: {id_reserva}"
+
+        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
+
         if "Reserva paga com sucesso!" in message:
             logging.info("Reserva paga com sucesso!")
-            return jsonify({"message": message}), 201  # CREATED
+            return jsonify({"message": message}), 201  
         else:
             logging.error(f"Erro ao pagar reserva: {message}")
-            return jsonify({"error": message}), 500  # INTERNAL_SERVER_ERROR
+            return jsonify({"error": message}), 500 
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
-        return jsonify({"error": "Internal Server Error"}), 500  # INTERNAL_SERVER_ERROR
+        return jsonify({"error": "Internal Server Error"}), 500
     
 @reservas_bp.route('/reserva/<int:id_cliente>/<int:id_quarto>/inserir', methods=['POST'])
 def registar_reserva(id_cliente, id_quarto):
@@ -165,3 +168,27 @@ def ver_todas_reservas():
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
+    
+
+@reservas_bp.route('/ver_seQuartoDisponivel', methods=['POST'])
+def verSeDisponivel():
+    try:
+        data = request.get_json()
+
+                #verificar se todos os parametros existem
+        if not all(k in data for k in ["p_idquarto", "data_pretendida"]):
+            logging.error("Faltam parametros!")
+
+            #erro no postman
+            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+        
+        if manageReservas.verDisponibilidadeQuarto(data["p_idquarto"], data["data_pretendida"]):
+            logging.info("Quarto ocupado")
+
+            return jsonify({"error": "Quarto n disponivel"}), CONFLICT
+        else:
+            logging.info("Quarto Disponivel")
+            return jsonify({"message":"Quarto disponivel"}), 201  
+        
+    except Exception as e:
+        return jsonify({"Erro"})
