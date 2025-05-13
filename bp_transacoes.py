@@ -3,6 +3,9 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.conn import BaseDeDados
 import logging
 from transacoes import ManageTransacoes
+from reservas import ManageReservas
+from auditoria import ManageAuditoria
+from datetime import datetime
 
 OK_CODE = 200
 BAD_REQUEST = 400
@@ -14,12 +17,16 @@ CREATED = 201
 transacoes_bp = Blueprint('transacoes', __name__)
 
 manageTransacoes = ManageTransacoes()
+manageAuditoria = ManageAuditoria()
 
 @transacoes_bp.route('/ver_pagamentos', methods=['POST'])
 @jwt_required()
 def ver_pagamentos():
     try:
         user = get_jwt_identity()
+        p_utilizador_app = user['nome']
+        p_utilizador_bd = user['db_user']
+        p_dataLog= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin']:
             logging.error("Unauthorized access attempt.")
@@ -30,6 +37,10 @@ def ver_pagamentos():
 
         if pagamentos:
             logging.info("Todos os pagamentos obtidos com sucesso!")
+            log_message = f"Ver pagamentos"
+
+            manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
+
             return jsonify({"pagamentos": pagamentos}), OK_CODE
         else:
             logging.error("Erro ao obter todos os upagamentos.")
@@ -46,8 +57,10 @@ def ver_pagamentos():
 def ver_pagamentos_cliente():
     try:
         data = request.get_json()
-        
-        user = get_jwt_identity()
+        user = get_jwt_identity()´
+        p_utilizador_app = user['nome']
+        p_utilizador_bd = user['db_user']
+        p_dataLog= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'cliente']:
             logging.error("Unauthorized access attempt.")
@@ -69,6 +82,8 @@ def ver_pagamentos_cliente():
 
         if pagamentos:
             logging.info("Pagamentos do cliente obtidos com sucesso!")
+            log_message = f"Ver pagamentos cliente ID: {data['p_idcliente']}"
+            manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
             return jsonify({"pagamentos": pagamentos}), OK_CODE
         else:
             logging.error("Erro ao obter pagamentos do cliente.")
