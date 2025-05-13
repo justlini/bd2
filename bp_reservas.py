@@ -29,7 +29,7 @@ def pagar_reserva(id_reserva):
         user = get_jwt_identity()
         p_utilizador_app = user['nome']
         p_utilizador_bd = user['db_user']
-        p_dataLog= datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        p_dataLog= datetime.now()
         
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
