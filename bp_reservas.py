@@ -164,7 +164,7 @@ def ver_reservas_cliente():
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
     
-@reservas_bp.route('/ver_todasReservas', methods=['POST'])
+@reservas_bp.route('/ver_todasReservas', methods=['GET'])
 @jwt_required()
 def ver_todas_reservas():
     try:
