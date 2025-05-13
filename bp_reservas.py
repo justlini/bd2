@@ -212,6 +212,12 @@ def verSeDisponivel():
             logging.info("Quarto ocupado")
 
             return jsonify({"error": "Quarto n disponivel"}), CONFLICT
+        
+        
+        if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+        
         else:
             logging.info("Quarto Disponivel")
             return jsonify({"message":"Quarto disponivel"}), 201  
