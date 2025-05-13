@@ -175,6 +175,10 @@ def ver_disponibilidade_quarto_route():
     p_utilizador_bd = user['db_user']
     p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+
     try:
         log_message = f"Ver disponiblidade de todos os quartos"
 
