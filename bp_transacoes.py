@@ -78,7 +78,7 @@ def ver_pagamentos_cliente():
 
         if pagamentos:
             logging.info("Pagamentos do cliente obtidos com sucesso!")
-            log_message = f"Viu pagamentos do com ID: {data['p_idcliente']}"
+            log_message = f"Viu pagamentos do cliente com ID: {data['p_idcliente']}"
             manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
             return jsonify({"pagamentos": pagamentos}), OK_CODE
         else:
