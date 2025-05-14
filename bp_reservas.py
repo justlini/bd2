@@ -84,7 +84,7 @@ def registar_reserva(id_cliente, id_quarto):
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), 500
 
-@reservas_bp.route('/cancelar_reserva/<int:p_idreserva>', methods=['POST'])
+@reservas_bp.route('/cancelar_reserva/<int:p_idreserva>', methods=['GET'])
 @jwt_required()
 def cancelar_reserva(p_idreserva):
     try:
