@@ -113,11 +113,10 @@ def cancelar_reserva(p_idreserva):
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
     
-@reservas_bp.route('/ver_reservasCliente', methods=['POST'])
+@reservas_bp.route('/ver_reservasCliente/<int:p_idcliente>', methods=['GET'])
 @jwt_required()
-def ver_reservas_cliente():
+def ver_reservas_cliente(p_idcliente):
     try:
-        data = request.get_json()
         user = get_jwt_identity()
         p_utilizador_app = user['nome']
         p_utilizador_bd = user['db_user']
@@ -127,22 +126,14 @@ def ver_reservas_cliente():
             logging.error("Unauthorized access attempt.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
         
-        if user['tipo'] == 'cliente' and data['p_idcliente'] != user['idcliente']:
+        if user['tipo'] == 'cliente' and p_idcliente != user['idcliente']:
             logging.error("Unauthorized access attempt.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
 
-
-        # Validar os parâmetros de entrada
-        if not all(k in data for k in ["p_idcliente"]):
-            logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
-
         # Chamar a função para ver as reservas do cliente
-        reservas = manageReservas.ver_reservasCliente(
-            data['p_idcliente']
-        )
+        reservas = manageReservas.ver_reservasCliente(p_idcliente)
 
-        log_message = f"Ver reserva cliente ID: {data['p_idcliente']}"
+        log_message = f"Ver reserva cliente ID: {p_idcliente}"
         manageAuditoria.insert_Log(p_utilizador_bd, p_utilizador_app, p_dataLog, log_message)
 
         if reservas:
