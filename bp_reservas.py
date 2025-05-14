@@ -84,39 +84,30 @@ def registar_reserva(id_cliente, id_quarto):
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), 500
 
-@reservas_bp.route('/cancelar_reserva', methods=['POST'])
+@reservas_bp.route('/cancelar_reserva/<int:p_idreserva>', methods=['POST'])
 @jwt_required()
-def cancelar_reserva():
+def cancelar_reserva(p_idreserva):
     try:
-        data = request.get_json()
         user = get_jwt_identity()
         p_utilizador_app = user['nome']
         p_utilizador_bd = user['db_user']
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("Unauthorized access attempt.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
 
-        # Validar os parâmetros de entrada
-        if not all(k in data for k in ["p_idreserva"]):
-            logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
+        # Chamar a função para cancelar a reserva
+        message = manageReservas.cancelar_reserva(p_idreserva)
 
-        # Chamar a função para pagar a reserva
-        message = manageReservas.cancelar_reserva(
-            data['p_idreserva']
-        )
-
-        log_message = f"Cancelar reserva: {data['p_idreserva']}"
+        log_message = f"Cancelar reserva: {p_idreserva}"
         manageAuditoria.insert_Log(p_utilizador_bd, p_utilizador_app, p_dataLog, log_message)
 
-        if "Reserva paga com sucesso!" in message:
-            logging.info("Reserva paga com sucesso!")
+        if "cancelada com sucesso" in message.lower():
+            logging.info(f"Reserva cancelada com sucesso: {p_idreserva}")
             return jsonify({"message": message}), CREATED
         else:
-            logging.error(f"Erro ao pagar reserva: {message}")
+            logging.error(f"Erro ao cancelar reserva: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
