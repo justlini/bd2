@@ -97,29 +97,25 @@ def mudartipoquarto():
         logging.error(f"Unexpected error: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR
 
-@quartos_bp.route('/get_ImagensQuarto', methods=['POST'])
+@quartos_bp.route('/get_ImagensQuarto/<int:p_idquarto>', methods=['GET'])
 @jwt_required()
-def get_imagens_quarto():
+def get_imagens_quarto(p_idquarto):
     try:
         user = get_jwt_identity()
-        data = request.get_json()
         p_utilizador_app = user['nome']
         p_utilizador_bd = user['db_user']
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Validar os parâmetros de entrada
-        if not all(k in data for k in ["p_idquarto"]):
-            logging.error("Faltam parametros!")
-            return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
-
         # Chamar a função para obter as imagens do quarto
-        imagens = manageQuartos.get_ImagensQuarto(
-            data['p_idquarto']
-        )
+        imagens = manageQuartos.get_ImagensQuarto(p_idquarto)
+
+        if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
+            logging.error("Unauthorized access attempt.")
+            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
 
         if imagens:
             logging.info("Imagens do quarto obtidas com sucesso!")
-            log_message = f"Buscar imagem quarto id {data['p_idquarto']}"
+            log_message = f"Get imagens do quarto id {p_idquarto}"
             manageAuditoria.insert_Log(p_utilizador_bd, p_utilizador_app, p_dataLog, log_message)
             return jsonify({"imagens": imagens}), OK_CODE
         else:
@@ -153,8 +149,6 @@ def upload_imagem_quarto_route():
             data['p_idquarto'],
             data['p_imagem']
         )
-
-
         if "Imagem do quarto carregada com sucesso!" in message:
             logging.info("Imagem do quarto carregada com sucesso!")
             log_message = f"Adicionar imagem ao quarto: {data['p_idquarto']}"
