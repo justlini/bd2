@@ -19,7 +19,7 @@ reservas_bp = Blueprint('reservas', __name__)
 manageReservas = ManageReservas()
 manageAuditoria = ManageAuditoria()
 
-@reservas_bp.route('/pagar_reserva/<int:id_reserva>', methods=['POST'])
+@reservas_bp.route('/pagar_reserva/<int:id_reserva>', methods=['GET'])
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
