@@ -22,22 +22,22 @@ manageAuditoria = ManageAuditoria()
 @jwt_required()
 def pagar_reserva(id_reserva):
     try:
-        # Obter os dados do utilizador autenticado
         user = get_jwt_identity()
         p_utilizador_app = user['nome']
         p_utilizador_bd = user['db_user']
-        p_dataLog= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'rececionista']:
             logging.error("tentativa de acesso não autorizado.")
             return jsonify({"error": "Unauthorized"}), 400 
-        manageReservas.pagar_reserva(id_reserva)
+        
+        # Obter a mensagem da função de pagar reserva
+        message = manageReservas.pagar_reserva(id_reserva)
 
         log_message = f"Pagar reserva: {id_reserva}"
+        manageAuditoria.insert_Log(p_utilizador_bd, p_utilizador_app, p_dataLog, log_message)
 
-        message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
-
-        if "Pagar reserva" in message:
+        if "paga com sucesso" in message.lower():
             logging.info("Reserva paga com sucesso!")
             return jsonify({"message": message}), 201
         else:
