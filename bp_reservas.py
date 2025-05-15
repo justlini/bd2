@@ -37,7 +37,7 @@ def pagar_reserva(id_reserva):
 
         message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
 
-        if "Reserva paga com sucesso!" in message:
+        if "Pagar reserva" in message:
             logging.info("Reserva paga com sucesso!")
             return jsonify({"message": message}), 201
         else:
