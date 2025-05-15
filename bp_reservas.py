@@ -13,7 +13,6 @@ INTERNAL_SERVER_ERROR = 500
 CREATED = 201
 
 
-# Create the Blueprint
 reservas_bp = Blueprint('reservas', __name__)
 
 manageReservas = ManageReservas()
@@ -30,7 +29,7 @@ def pagar_reserva(id_reserva):
         p_dataLog= datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'rececionista']:
-            logging.error("Unauthorized access attempt.")
+            logging.error("tentativa de acesso não autorizado.")
             return jsonify({"error": "Unauthorized"}), 400 
         manageReservas.pagar_reserva(id_reserva)
 
@@ -45,7 +44,7 @@ def pagar_reserva(id_reserva):
             logging.error(f"Erro ao pagar reserva: {message}")
             return jsonify({"error": message}), 500 
     except Exception as e:
-        logging.error(f"Unexpected error: {str(e)}")
+        logging.error(f"Erro nao esperado: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), 500
     
 @reservas_bp.route('/reserva/<int:id_cliente>/<int:id_quarto>/inserir', methods=['POST'])
@@ -123,12 +122,12 @@ def ver_reservas_cliente(p_idcliente):
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+            logging.error("Acesso não autorizado.")
+            return jsonify({"error": "Acesso não autorizado"}), BAD_REQUEST
         
         if user['tipo'] == 'cliente' and p_idcliente != user['idcliente']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+            logging.error("Aviso: Cliente não autorizado a ver reservas de outro cliente.")
+            return jsonify({"error": "Nao autorizado"}), BAD_REQUEST
 
         # Chamar a função para ver as reservas do cliente
         reservas = manageReservas.ver_reservasCliente(p_idcliente)
@@ -153,8 +152,8 @@ def ver_todas_reservas():
         user = get_jwt_identity()
         
         if user['tipo'] not in ['admin']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+            logging.error("Tentativa de acesso não autorizado.")
+            return jsonify({"error": "Nao autorizado"}), BAD_REQUEST
 
         # Chamar a função para ver todas as reservas
         reservas = manageReservas.ver_todasReservas()
@@ -197,7 +196,7 @@ def verSeDisponivel():
         
         
         if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
-            logging.error("Unauthorized access attempt.")
+            logging.error("Tentativa de acesso não autorizado.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
         
         else:

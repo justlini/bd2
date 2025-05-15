@@ -34,8 +34,8 @@ def mudarprecoquarto():
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] != 'admin':
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+            logging.error("Tentativa de acesso não autorizada.")
+            return jsonify({"error": "Nao autorizado"}), BAD_REQUEST
 
         # Validar os parâmetros de entrada
         if not all(k in data for k in ["p_idquarto", "p_precoQuarto"]):
@@ -71,7 +71,7 @@ def mudartipoquarto():
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] != 'admin':
-            logging.error("Unauthorized access attempt.")
+            logging.error("Tentativa de acesso não autorizada.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
         
         # Validar os parâmetros de entrada
@@ -110,8 +110,8 @@ def get_imagens_quarto(p_idquarto):
         imagens = manageQuartos.get_ImagensQuarto(p_idquarto)
 
         if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+            logging.error("Tentativa de acesso não autorizado.")
+            return jsonify({"error": "Nao autorizado"}), BAD_REQUEST
 
         if imagens:
             logging.info("Imagens do quarto obtidas com sucesso!")
@@ -136,8 +136,8 @@ def upload_imagem_quarto_route():
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'rececionista']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+            logging.error("Tentativa de acesso não autorizada.")
+            return jsonify({"error": "Nao autorizado"}), BAD_REQUEST
         
         # Validar os parâmetros de entrada
         if not all(k in data for k in ["p_idquarto", "p_imagem"]):
@@ -170,8 +170,8 @@ def ver_disponibilidade_quarto_route():
     p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if user['tipo'] not in ['admin', 'rececionista', 'cliente']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+            logging.error("Tentativa de acesso não autorizada.")
+            return jsonify({"error": "Nao autorizado"}), BAD_REQUEST
 
     try:
         log_message = f"Ver disponiblidade de todos os quartos"

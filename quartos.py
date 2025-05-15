@@ -11,7 +11,6 @@ class ManageQuartos:
 
         try:
             cur = conn.cursor()
-        # Correct the query to pass all parameters dynamically
             cur.execute("CALL inserirquartos(%s, %s, %s);", (p_numeroquarto, p_precoquarto, p_tipoquarto))
             conn.commit()
             cur.close()
@@ -82,7 +81,7 @@ class ManageQuartos:
     def quarto_exists(self,p_numeroquarto):
         conn = self.bd.get_conn()
         if conn is None:
-            return False  # Se não conseguir se conectar na base de dados, assume que o utilizador não existe
+            return False 
 
         try:
             cur = conn.cursor()

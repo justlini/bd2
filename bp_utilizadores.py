@@ -44,8 +44,8 @@ def registar_emp():
             return jsonify({"error": "Faltam parametros!"}), BAD_REQUEST
         
         if user['tipo'] not in ['admin']:
-            logging.error("Unauthorized access attempt.")
-            return jsonify({"error": "Unauthorized"}), BAD_REQUEST
+            logging.error("Tentativa de acesso não autorizado.")
+            return jsonify({"error": "Nao autorizado"}), BAD_REQUEST
 
         #verificar se o empregado já exsite
         if utilizadores.emp_exists(data["idemp"], data["idcliente"]):
@@ -60,7 +60,7 @@ def registar_emp():
             logging.error("Tipo de mepregado invalido!")
 
             # erro no postman
-            return jsonify({"error": "Tipo de mepregado invalido!"}), BAD_REQUEST
+            return jsonify({"error": "Tipo de empregado invalido!"}), BAD_REQUEST
 
         #formato do body json esperado
         message = utilizadores.insert_emp(
@@ -101,10 +101,8 @@ def register():
             return jsonify({"error": "Missing required parameters"}), BAD_REQUEST
 
         if utilizadores.user_exists(data["email"], data["nif"]):
-            logging.error("User with this email or NIF already exists.")
-            logging.error("Empregado com este ID já existe")
-            logging.error("Utilizador com este mail ou NIF já existe!")
-            return jsonify({"error": "User with this email or NIF already exists"}), CONFLICT
+            logging.error("Utilizador com este email ou NIF já existe!")
+            return jsonify({"error": "Utilizador com este email ou NIF já existe"}), CONFLICT
         
         hashar_password = bcrypt.hashpw(data['senha'].encode('utf-8'), bcrypt.gensalt())
     
@@ -124,7 +122,7 @@ def register():
             message = manageAuditoria.insert_Log(data['nome'],data['email'],p_dataLog,log_message)
             return jsonify({"message": message}), CREATED
         else:
-            logging.error(f"Error inserting user: {message}")
+            logging.error(f"Erro ao inserir utilizador: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
@@ -136,19 +134,18 @@ def login():
     try:
         data = request.get_json()
 
-        # Log received data
-        logging.debug(f"Login data received: {data}")
+        # Dados recebidos
+        logging.debug(f"Dados login recebidos: {data}")
 
-        # Validate input parameters
+        # Validar os parâmetros de entrada
         if not all(k in data for k in ["email", "senha"]):
-            logging.error("Missing email or password.")
-            return jsonify({"error": "Missing email or password"}), BAD_REQUEST
+            logging.error("Faltam parametros!")
+            return jsonify({"error": "Faltam parametros"}), BAD_REQUEST
 
-        # Connect to the database with default credentials
         conn = bd.get_conn()
         if conn is None:
-            logging.error("Database connection failed.")
-            return jsonify({"error": "Database connection failed"}), INTERNAL_SERVER_ERROR
+            logging.error("Conexão a base de dados falhou.")
+            return jsonify({"error": "Conexao a base de dados falhou"}), INTERNAL_SERVER_ERROR
 
         cur = conn.cursor()
         cur.execute("SELECT * FROM public.get_userData(%s)", (data["email"],))
@@ -158,16 +155,17 @@ def login():
         conn.close()
 
         if user and bcrypt.checkpw(data['senha'].encode('utf-8'), user[3].encode('utf-8')):
-            # Determine the user's role
+            # Se a senha estiver correta, verificar o tipo de utilizador
+            # user[4] é o tipo de utilizador (admin, rececionista, cliente) se for none é um cliente
             role = str(user[4]) if user[4] else "cliente"
 
-            # Connect to the database with role-specific credentials
+            # Fazer a conexão à base de dados com o tipo de utilizadoR
             conn_nova = BaseDeDados(user_type=role)
             if conn_nova.get_conn() is None:
-                logging.error("Database connection failed with role-specific credentials.")
-                return jsonify({"error": "Database connection failed"}), INTERNAL_SERVER_ERROR
+                logging.error("Conexão a base de dados falhou.")
+                return jsonify({"error": "Conexao a base de dados falhou"}), INTERNAL_SERVER_ERROR
 
-            # Login successful
+            # Criar o token de acesso
             user_data = {
                 "idcliente": str(user[0]),
                 "nome": str(user[1]),
@@ -178,11 +176,11 @@ def login():
             token = create_access_token(identity=user_data)
         
 
-            logging.info(f"User {user[2]} logged in successfully as {role}.")
-            return jsonify({"message": "Login successful", "access_token": token, "user": user_data}), OK_CODE
+            logging.info(f"Utilizador {user[2]} logou com sucesso com o {role}.")
+            return jsonify({"message": "Login com sucesso", "access_token": token, "user": user_data}), OK_CODE
         else:
-            logging.warning("Invalid email or password.")
-            return jsonify({"error": "Invalid email or password"}), BAD_REQUEST
+            logging.warning("Email invalido ou password.")
+            return jsonify({"error": "Email invalido ou password"}), BAD_REQUEST
     except Exception as e:
-        logging.error(f"Login error: {str(e)}")
+        logging.error(f"Erro login: {str(e)}")
         return jsonify({"error": "Internal Server Error"}), INTERNAL_SERVER_ERROR

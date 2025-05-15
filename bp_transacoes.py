@@ -27,7 +27,7 @@ def ver_pagamentos():
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin']:
-            logging.error("Unauthorized access attempt.")
+            logging.error("Tentativa de acesso não autorizado.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
         
         # Chamar a função para ver todos os pagamentos
@@ -40,7 +40,6 @@ def ver_pagamentos():
             return jsonify({"pagamentos": pagamentos}), OK_CODE
         else:
             logging.error("Erro ao obter todos os upagamentos.")
-            logging.error("Erro ao obter todos os pagamentos.")
             # erro no postman
             return jsonify({"error": "Erro ao obter todos os pagamentos."}), INTERNAL_SERVER_ERROR
     except Exception as e:
@@ -58,11 +57,11 @@ def ver_pagamentos_cliente(p_idcliente):
         p_dataLog = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         if user['tipo'] not in ['admin', 'cliente']:
-            logging.error("Unauthorized access attempt.")
+            logging.error("Tentativa de acesso não autorizado.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
         
         if user['tipo'] == 'cliente' and p_idcliente != user['idcliente']:
-            logging.error("Unauthorized access attempt.")
+            logging.error("Tentativa de acesso não autorizado.")
             return jsonify({"error": "Unauthorized"}), BAD_REQUEST
 
         # Chamar a função para ver os pagamentos do cliente

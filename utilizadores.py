@@ -40,7 +40,7 @@ class Utilizadores:
     def emp_exists(self,idemp, idcliente):
         conn = self.bd.get_conn()
         if conn is None:
-            return False  # Se não conseguir se conectar ao banco, assume que o usuário não existe
+            return False 
     
         try:
             cur = conn.cursor()

@@ -1,6 +1,6 @@
 import os
 import psycopg2
-from flask import Flask, jsonify, request  # Flask is now imported
+from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token
 from api.conn import BaseDeDados
 from utilizadores import Utilizadores
@@ -33,7 +33,7 @@ CREATED = 201
 
 bd = BaseDeDados()
 
-# caminho para ir buscar as variaveis de ambiente
+
 
 @app.route('/')
 def home():
@@ -78,6 +78,7 @@ def home():
     </html>
     """
 
+#routes
 app.register_blueprint(reservas_bp)
 
 app.register_blueprint(transacoes_bp)
@@ -86,8 +87,6 @@ app.register_blueprint(utilizadores_bp)
 
 app.register_blueprint(quartos_bp)
 
-# Rota para login de usuário
 
-# Execução do aplicativo Flask
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

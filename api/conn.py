@@ -25,7 +25,7 @@ class BaseDeDados:
 
     def get_conn(self):
         if not all([self.host, self.database, self.user, self.password]):
-            print("Missing database connection parameters.")
+            print("Faltam variaveis de ambiente para a ligação à base de dados.")
             return None
 
         try:
@@ -35,7 +35,7 @@ class BaseDeDados:
                 user=self.user,
                 password=self.password
             )
-            print("Database connection successful.")
+            print("Ligação à base de dados estabelecida com sucesso.")
             return connection
         except Exception as e:
             print(f"Erro ao conectar à base de dados: {str(e)}")
