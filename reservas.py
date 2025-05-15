@@ -30,7 +30,7 @@ class ManageReservas:
             conn.commit()
             cur.close()
             conn.close()
-            return "Reserva paga com sucesso!"
+            return "Pagar reserva"
         except Exception as e:
             return str(e)
         
