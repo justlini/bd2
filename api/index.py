@@ -46,24 +46,21 @@ def home():
         <title>Trabalho Base de Dados 2</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
-                text-align: center;
-                background-color: #f4f4f9;
-                color: #333;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
+                font-family: sans-serif;
+                background-color: #ffffff;
+                color: #000000;
+                margin: 10px;
+                padding: 10px;
             }
+            
             h1 {
-                font-size: 3rem;
-                color: #4CAF50;
+                font-size: 32px; /* equivalente a aproximadamente 2em */
+                color: blue;
             }
+            
             p {
-                font-size: 1.2rem;
-                color: #555;
+                font-size: 16px; /* equivalente a aproximadamente 1em */
+                color: #333333;
             }
         </style>
     </head>
