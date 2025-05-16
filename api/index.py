@@ -107,7 +107,7 @@ def home():
                 <p><b>Miguel Plácido</b></p>
             </div>
             <div class="fernando-anim">
-                <img src="/static/fernando.gif" alt="Fernando Mendes a rodar">
+                <img src="https://media1.tenor.com/m/EFDwfjT2GuQAAAAd/spinning-cat.gif" alt="Fernando Mendes a rodar">
             </div>
             <p style="margin-top:1.5em; color:#888; font-size:0.95em;">
                 Powered by Flask &mdash; O Preço Certo!
