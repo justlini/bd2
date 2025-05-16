@@ -39,84 +39,36 @@ bd = BaseDeDados()
 def home():
     return """
     <!DOCTYPE html>
-    <html lang="pt">
+    <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Trabalho Base de Dados 2</title>
         <style>
             body {
-                font-family: 'Segoe UI', sans-serif;
-                background: url('https://media-manager.noticiasaominuto.com/960/naom_5a4e05ce125b2.webp?crop_params=dW5kZWZpbmVk') no-repeat center center fixed;
-                background-size: cover;
-                background-color: #ff2d87;
-                color: #fff;
-                margin: 0;
-                padding: 0;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
+                font-family: sans-serif;
+                color: #000000;
+                margin: 10px;
+                padding: 10px;
             }
-            .container {
-                background: rgba(255, 45, 135, 0.92);
-                border-radius: 18px;
-                box-shadow: 0 4px 32px rgba(255,45,135,0.18);
-                padding: 44px 36px 36px 36px;
-                text-align: center;
-                max-width: 440px;
-                margin: 32px;
-            }
+            
             h1 {
-                font-size: 2.7rem;
-                color: #fff;
-                margin-bottom: 0.5em;
-                letter-spacing: 1px;
-                text-shadow: 0 2px 12px #ff2d87cc;
+                font-size: 32px;
+                color: blue;
             }
-            .autores {
-                margin-top: 1.5em;
-                font-size: 1.15rem;
-                color: #fff;
-            }
-            .fernando-anim {
-                margin: 32px auto 0 auto;
-                width: 180px;
-                height: 180px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .fernando-anim img {
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
-                border: 4px solid #fff;
-                box-shadow: 0 2px 18px #ff2d87cc;
-                background: #fff;
-                object-fit: cover;
-            }
-            @media (max-width: 600px) {
-                .container { max-width: 98vw; padding: 18px 4vw; }
-                .fernando-anim { width: 120px; height: 120px; }
+            
+            p {
+                font-size: 16px;
+                color: #333333;
             }
         </style>
     </head>
     <body>
-        <div class="container">
+        <div>
             <h1>Trabalho Base de Dados 2</h1>
-            <div class="autores">
-                <p>Trabalho realizado por:</p>
-                <p><b>Alexandre Brito</b></p>
-                <p><b>Miguel Plácido</b></p>
-            </div>
-            <div class="fernando-anim">
-                <img src="https://media1.tenor.com/m/EFDwfjT2GuQAAAAd/spinning-cat.gif" alt="Fernando Mendes">
-            </div>
-            <p style="margin-top:1.5em; color:#fff; font-size:0.98em; text-shadow:0 1px 8px #ff2d87cc;">
-                Powered by Flask &mdash; O Preço Certo!
-            </p>
+            <p>Trabalho realizado por:</p>
+            <p>Alexandre Brito</p>
+            <p>Miguel Plácido</p>
         </div>
     </body>
     </html>
