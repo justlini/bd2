@@ -47,7 +47,7 @@ def home():
         <style>
             body {
                 font-family: 'Segoe UI', sans-serif;
-                background: url('https://www.google.pt/url?sa=i&url=https%3A%2F%2Fwww.noticiasaominuto.com%2Ffama%2F926490%2Fvideo-fernando-mendes-fica-em-tronco-nu-em-pleno-programa&psig=AOvVaw1EA9qB2KWMaJGhMYUKfjgf&ust=1747491599470000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNjehdKXqI0DFQAAAAAdAAAAABAE') no-repeat center center fixed;
+                background: url('https://media-manager.noticiasaominuto.com/960/naom_5a4e05ce125b2.webp?crop_params=dW5kZWZpbmVk') no-repeat center center fixed;
                 background-size: cover;
                 background-color: #ff2d87;
                 color: #fff;
