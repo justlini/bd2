@@ -47,7 +47,7 @@ def home():
         <style>
             body {
                 font-family: 'Segoe UI', sans-serif;
-                background: url('https://i.imgur.com/1Q9Z1Zm.jpg') no-repeat center center fixed;
+                background: url('https://www.google.pt/url?sa=i&url=https%3A%2F%2Fwww.noticiasaominuto.com%2Ffama%2F926490%2Fvideo-fernando-mendes-fica-em-tronco-nu-em-pleno-programa&psig=AOvVaw1EA9qB2KWMaJGhMYUKfjgf&ust=1747491599470000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNjehdKXqI0DFQAAAAAdAAAAABAE') no-repeat center center fixed;
                 background-size: cover;
                 background-color: #ff2d87;
                 color: #fff;
@@ -112,7 +112,7 @@ def home():
                 <p><b>Miguel Plácido</b></p>
             </div>
             <div class="fernando-anim">
-                <img src="https://media1.tenor.com/m/6QwQvQ5p4gEAAAAC/fernando-mendes-preco-certo.gif" alt="Fernando Mendes">
+                <img src="https://media1.tenor.com/m/EFDwfjT2GuQAAAAd/spinning-cat.gif" alt="Fernando Mendes">
             </div>
             <p style="margin-top:1.5em; color:#fff; font-size:0.98em; text-shadow:0 1px 8px #ff2d87cc;">
                 Powered by Flask &mdash; O Preço Certo!
