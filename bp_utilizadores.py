@@ -119,7 +119,7 @@ def register():
         if "Utilizador inserido com sucesso!" in message:
             logging.info("Utilizador inserido com sucesso!")
             log_message = f"Conta criada: {data['email']}"
-            message = manageAuditoria.insert_Log(data['nome'],data['email'],p_dataLog,log_message)
+            manageAuditoria.insert_Log(data['nome'],data['email'],p_dataLog,log_message)
             return jsonify({"message": message}), CREATED
         else:
             logging.error(f"Erro ao inserir utilizador: {message}")
