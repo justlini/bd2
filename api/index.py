@@ -112,6 +112,9 @@ def home():
             <p style="margin-top:1.5em; color:#888; font-size:0.95em;">
                 Powered by Flask &mdash; O Preço Certo!
             </p>
+            <div class = "background-image">
+                <img src="https://www.google.pt/url?sa=i&url=https%3A%2F%2Fwww.noticiasaominuto.com%2Ffama%2F926490%2Fvideo-fernando-mendes-fica-em-tronco-nu-em-pleno-programa&psig=AOvVaw1EA9qB2KWMaJGhMYUKfjgf&ust=1747491599470000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNjehdKXqI0DFQAAAAAdAAAAABAE" alt="Imagem de fundo">
+            </div>
         </div>
     </body>
     </html>
