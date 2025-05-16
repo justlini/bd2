@@ -73,7 +73,7 @@ def registar_emp():
         if "Empregado inserido com sucesso!" in message:
             logging.info("Empregado inserido com sucesso!")
             log_message = f"Conta empregado criada: {data['idemp']}"
-            message = manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
+            manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
 
             #mensagem sucess no postman
             return jsonify({"message": message}), CREATED
