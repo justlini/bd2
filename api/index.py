@@ -47,8 +47,10 @@ def home():
         <style>
             body {
                 font-family: 'Segoe UI', sans-serif;
-                background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-                color: #222;
+                background: url('https://i.imgur.com/1Q9Z1Zm.jpg') no-repeat center center fixed;
+                background-size: cover;
+                background-color: #ff2d87;
+                color: #fff;
                 margin: 0;
                 padding: 0;
                 min-height: 100vh;
@@ -58,22 +60,25 @@ def home():
                 justify-content: center;
             }
             .container {
-                background: #fff;
-                border-radius: 16px;
-                box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-                padding: 40px 32px 32px 32px;
+                background: rgba(255, 45, 135, 0.92);
+                border-radius: 18px;
+                box-shadow: 0 4px 32px rgba(255,45,135,0.18);
+                padding: 44px 36px 36px 36px;
                 text-align: center;
-                max-width: 420px;
+                max-width: 440px;
+                margin: 32px;
             }
             h1 {
-                font-size: 2.5rem;
-                color: #1976d2;
+                font-size: 2.7rem;
+                color: #fff;
                 margin-bottom: 0.5em;
+                letter-spacing: 1px;
+                text-shadow: 0 2px 12px #ff2d87cc;
             }
             .autores {
                 margin-top: 1.5em;
-                font-size: 1.1rem;
-                color: #444;
+                font-size: 1.15rem;
+                color: #fff;
             }
             .fernando-anim {
                 margin: 32px auto 0 auto;
@@ -82,19 +87,19 @@ def home():
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                animation: rodar 3s linear infinite;
-            }
-            @keyframes rodar {
-                0% { transform: rotate(0deg);}
-                100% { transform: rotate(360deg);}
             }
             .fernando-anim img {
                 width: 100%;
                 height: 100%;
                 border-radius: 50%;
-                border: 4px solid #1976d2;
-                box-shadow: 0 2px 12px rgba(25,118,210,0.15);
+                border: 4px solid #fff;
+                box-shadow: 0 2px 18px #ff2d87cc;
                 background: #fff;
+                object-fit: cover;
+            }
+            @media (max-width: 600px) {
+                .container { max-width: 98vw; padding: 18px 4vw; }
+                .fernando-anim { width: 120px; height: 120px; }
             }
         </style>
     </head>
@@ -107,14 +112,11 @@ def home():
                 <p><b>Miguel Plácido</b></p>
             </div>
             <div class="fernando-anim">
-                <img src="https://media1.tenor.com/m/EFDwfjT2GuQAAAAd/spinning-cat.gif" alt="Fernando Mendes a rodar">
+                <img src="https://media1.tenor.com/m/6QwQvQ5p4gEAAAAC/fernando-mendes-preco-certo.gif" alt="Fernando Mendes">
             </div>
-            <p style="margin-top:1.5em; color:#888; font-size:0.95em;">
+            <p style="margin-top:1.5em; color:#fff; font-size:0.98em; text-shadow:0 1px 8px #ff2d87cc;">
                 Powered by Flask &mdash; O Preço Certo!
             </p>
-            <div class = "background-image">
-                <img src="https://www.google.pt/url?sa=i&url=https%3A%2F%2Fwww.noticiasaominuto.com%2Ffama%2F926490%2Fvideo-fernando-mendes-fica-em-tronco-nu-em-pleno-programa&psig=AOvVaw1EA9qB2KWMaJGhMYUKfjgf&ust=1747491599470000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNjehdKXqI0DFQAAAAAdAAAAABAE" alt="Imagem de fundo">
-            </div>
         </div>
     </body>
     </html>
