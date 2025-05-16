@@ -47,19 +47,18 @@ def home():
         <style>
             body {
                 font-family: sans-serif;
-                background-color: #ffffff;
                 color: #000000;
                 margin: 10px;
                 padding: 10px;
             }
             
             h1 {
-                font-size: 32px; /* equivalente a aproximadamente 2em */
+                font-size: 32px;
                 color: blue;
             }
             
             p {
-                font-size: 16px; /* equivalente a aproximadamente 1em */
+                font-size: 16px;
                 color: #333333;
             }
         </style>
