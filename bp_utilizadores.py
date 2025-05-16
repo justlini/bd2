@@ -76,7 +76,7 @@ def registar_emp():
             manageAuditoria.insert_Log(p_utilizador_bd,p_utilizador_app,p_dataLog,log_message)
 
             #mensagem sucess no postman
-            return jsonify({"message": message}), CREATED
+            return jsonify({"utilizador inserido": message}), CREATED
         else:
             logging.error(f"Erro ao inserir empregado: {message}")
             return jsonify({"error": message}), INTERNAL_SERVER_ERROR
